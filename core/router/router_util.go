@@ -1,6 +1,10 @@
 package router
 
-import "github.com/XiaoMi/Gaea/parser"
+import (
+	"github.com/XiaoMi/Gaea/common"
+	"github.com/XiaoMi/Gaea/parser"
+	"strings"
+)
 
 func CanHandleWithoutPlan(stmtType int) bool {
 	return stmtType == parser.StmtShow ||
@@ -10,4 +14,15 @@ func CanHandleWithoutPlan(stmtType int) bool {
 		stmtType == parser.StmtRollback ||
 		stmtType == parser.StmtSavepoint ||
 		stmtType == parser.StmtUse
+}
+
+func CanExecuteFromSlave(sql string) bool {
+	if parser.Preview(sql) != parser.StmtSelect {
+		return false
+	}
+
+	_, comments := parser.SplitMarginComments(sql)
+	hint := strings.ToLower(strings.TrimSpace(comments.Leading))
+	result := strings.ToLower(hint) == common.MasterHint
+	return !result
 }

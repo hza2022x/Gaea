@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/XiaoMi/Gaea/common"
+	"github.com/XiaoMi/Gaea/core/router"
 	"strconv"
 	"strings"
 	"sync"
@@ -565,30 +566,13 @@ func getVariableExprResult(v ast.ExprNode) string {
 	return strings.ToLower(s.String())
 }
 
-func getOnOffVariable(v string) (string, error) {
-	if v == "1" || v == "on" {
-		return "1", nil
-	} else if v == "0" || v == "off" {
-		return "0", nil
-	} else {
-		return "", fmt.Errorf("not an on off string")
-	}
-}
-
-// CanExecuteFromSlave master-slave routing
-func CanExecuteFromSlave(c *SessionExecutor, sql string) bool {
-	if parser.Preview(sql) != parser.StmtSelect {
+// canExecuteFromSlave master-slave routing
+func canExecuteFromSlave(c *SessionExecutor, sql string) bool {
+	result := router.CanExecuteFromSlave(sql)
+	if !result {
 		return false
 	}
-
-	_, comments := parser.SplitMarginComments(sql)
-	lcomment := strings.ToLower(strings.TrimSpace(comments.Leading))
-	var fromSlave = c.GetNamespace().IsRWSplit(c.user)
-	if strings.ToLower(lcomment) == common.MasterHint {
-		fromSlave = false
-	}
-
-	return fromSlave
+	return c.GetNamespace().IsRWSplit(c.user)
 }
 
 // 如果是只读用户, 且SQL是INSERT, UPDATE, DELETE, 则拒绝执行, 返回true

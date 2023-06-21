@@ -14,7 +14,10 @@
 
 package util
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+)
 
 func Concat(strings ...string) string {
 	var buffer bytes.Buffer
@@ -22,4 +25,14 @@ func Concat(strings ...string) string {
 		buffer.WriteString(s)
 	}
 	return buffer.String()
+}
+
+func GetOnOffVariable(v string) (string, error) {
+	if v == "1" || v == "on" {
+		return "1", nil
+	} else if v == "0" || v == "off" {
+		return "0", nil
+	} else {
+		return "", fmt.Errorf("not an on off string")
+	}
 }

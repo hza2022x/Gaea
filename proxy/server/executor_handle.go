@@ -98,7 +98,7 @@ func (se *SessionExecutor) doQuery(reqCtx *util.RequestContext, sql string) (*my
 		return nil, fmt.Errorf("get plan error, db: %s, sql: %s, err: %v", db, sql, err)
 	}
 
-	if CanExecuteFromSlave(se, sql) {
+	if canExecuteFromSlave(se, sql) {
 		reqCtx.Set(util.FromSlave, 1)
 	}
 
@@ -272,7 +272,7 @@ func (se *SessionExecutor) handleSetVariable(v *ast.VariableAssignment) error {
 		return se.setStringSessionVariable(mysql.SQLModeStr, sqlMode)
 	case "sql_safe_updates":
 		value := getVariableExprResult(v.Value)
-		onOffValue, err := getOnOffVariable(value)
+		onOffValue, err := util.GetOnOffVariable(value)
 		if err != nil {
 			return mysql.NewDefaultError(mysql.ErrWrongValueForVar, name, value)
 		}
@@ -293,7 +293,7 @@ func (se *SessionExecutor) handleSetVariable(v *ast.VariableAssignment) error {
 		return fmt.Errorf("does not support set transaction in gaea")
 	case gaeaGeneralLogVariable:
 		value := getVariableExprResult(v.Value)
-		onOffValue, err := getOnOffVariable(value)
+		onOffValue, err := util.GetOnOffVariable(value)
 		if err != nil {
 			return mysql.NewDefaultError(mysql.ErrWrongValueForVar, name, value)
 		}
