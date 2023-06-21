@@ -17,6 +17,7 @@ package executor
 import (
 	"errors"
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/router"
 	"net"
 	"strconv"
 	"strings"
@@ -27,7 +28,6 @@ import (
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/proxy/plan"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/XiaoMi/Gaea/proxy/sequence"
 	"github.com/XiaoMi/Gaea/util"
 	"github.com/XiaoMi/Gaea/util/cache"

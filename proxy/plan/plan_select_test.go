@@ -15,9 +15,8 @@
 package plan
 
 import (
+	"github.com/XiaoMi/Gaea/core/router"
 	"testing"
-
-	"github.com/XiaoMi/Gaea/proxy/router"
 )
 
 func TestSimpleSelectShardMycatMod(t *testing.T) {

@@ -16,9 +16,9 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/router"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/XiaoMi/Gaea/proxy/sequence"
 	"github.com/XiaoMi/Gaea/util"
 )

@@ -29,6 +29,7 @@
 package router
 
 import (
+	"github.com/XiaoMi/Gaea/common/constant"
 	"testing"
 )
 
@@ -61,7 +62,7 @@ func TestParseYearRange(t *testing.T) {
 
 	dateRange = "20120"
 	years, err = ParseYearRange(dateRange)
-	if err != common.ErrDateRangeIllegal || years != nil {
+	if err != constant.ErrDateRangeIllegal || years != nil {
 		t.Fatal(err)
 	}
 
@@ -114,7 +115,7 @@ func TestParseMonthRange(t *testing.T) {
 
 	dateRange = "20120"
 	months, err = ParseMonthRange(dateRange)
-	if err != common.ErrDateRangeIllegal || months != nil {
+	if err != constant.ErrDateRangeIllegal || months != nil {
 		t.Fatal(err)
 	}
 
@@ -164,7 +165,7 @@ func TestParseDayRange(t *testing.T) {
 
 	dateRange = "2016034"
 	days, err = ParseDayRange(dateRange)
-	if err != common.ErrDateRangeIllegal || days != nil {
+	if err != constant.ErrDateRangeIllegal || days != nil {
 		t.Fatal(err)
 	}
 

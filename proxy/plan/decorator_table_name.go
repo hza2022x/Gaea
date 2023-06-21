@@ -16,10 +16,10 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/router"
 
 	"github.com/XiaoMi/Gaea/parser/ast"
 	"github.com/XiaoMi/Gaea/parser/format"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/pingcap/errors"
 )
 

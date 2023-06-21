@@ -16,13 +16,13 @@ package plan
 
 import (
 	"encoding/json"
+	"github.com/XiaoMi/Gaea/core/router"
 	"sync/atomic"
 	"testing"
 
 	"github.com/XiaoMi/Gaea/backend"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/parser"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/XiaoMi/Gaea/proxy/sequence"
 )
 

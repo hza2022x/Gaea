@@ -16,9 +16,9 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/router"
 
 	"github.com/XiaoMi/Gaea/parser/ast"
-	"github.com/XiaoMi/Gaea/proxy/router"
 )
 
 // SubqueryColumnNameRewriteVisitor visit ColumnNameExpr in subquery, check if need decorate, and then decorate it.

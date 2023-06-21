@@ -16,12 +16,12 @@ package plan
 
 import (
 	"fmt"
+	router2 "github.com/XiaoMi/Gaea/core/router"
 
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"
 	"github.com/XiaoMi/Gaea/parser/opcode"
 	driver "github.com/XiaoMi/Gaea/parser/tidb-types/parser_driver"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/XiaoMi/Gaea/util"
 )
 
@@ -49,7 +49,7 @@ type SelectPlan struct {
 
 // NewSelectPlan constructor of SelectPlan
 // db is the session db
-func NewSelectPlan(db string, sql string, r *router.Router) *SelectPlan {
+func NewSelectPlan(db string, sql string, r *router2.Router) *SelectPlan {
 	return &SelectPlan{
 		TableAliasStmtInfo: NewTableAliasStmtInfo(db, sql, r),
 		aggregateFuncs:     make(map[int]AggregateFuncMerger),
@@ -149,7 +149,7 @@ func (s *SelectPlan) GetSQLs() map[string]map[string][]string {
 	return s.sqls
 }
 
-//执行计划是否仅仅涉及一个分片
+// 执行计划是否仅仅涉及一个分片
 func (s *SelectPlan) isExecOnSingleNode() bool {
 	if len(s.result.indexes) == 1 {
 		return true
@@ -527,12 +527,12 @@ func postHandleHintDatabaseFunction(p *SelectPlan) error {
 	if !ok {
 		return fmt.Errorf("sharding rule of route result not found, result: %v", p.result)
 	}
-	mr, ok := rule.(router.MycatRule)
+	mr, ok := rule.(router2.MycatRule)
 	if !ok {
 		return fmt.Errorf("sharding rule is not mycat mode, result: %v", p.result)
 	}
 
-	if !router.IsMycatShardingRule(mr.GetType()) { // TODO: need refactor, why is MycatRule's type not mycat rule?
+	if !router2.IsMycatShardingRule(mr.GetType()) { // TODO: need refactor, why is MycatRule's type not mycat rule?
 		return fmt.Errorf("only mycat rule supports database function hint")
 	}
 
@@ -844,8 +844,8 @@ func getDatabaseFuncHint(f *ast.FuncCallExpr, v ast.ExprNode) (string, error) {
 
 // 返回一个根据路由信息和路由值获取路由结果的函数
 // 左边为列名, 右边为参数
-func getFindTableIndexesFunc(op opcode.Op) func(rule router.Rule, columnName string, v interface{}) ([]int, error) {
-	findTableIndexesFunc := func(rule router.Rule, columnName string, v interface{}) ([]int, error) {
+func getFindTableIndexesFunc(op opcode.Op) func(rule router2.Rule, columnName string, v interface{}) ([]int, error) {
+	findTableIndexesFunc := func(rule router2.Rule, columnName string, v interface{}) ([]int, error) {
 		// 如果不是分表列, 则需要返回所有分片
 		if rule.GetShardingColumn() != columnName {
 			return rule.GetSubTableIndexes(), nil
@@ -863,7 +863,7 @@ func getFindTableIndexesFunc(op opcode.Op) func(rule router.Rule, columnName str
 			return rule.GetSubTableIndexes(), nil
 		case opcode.GT, opcode.GE, opcode.LT, opcode.LE:
 			// 如果是range路由, 需要做一些特殊处理
-			if rangeShard, ok := rule.GetShard().(router.RangeShard); ok {
+			if rangeShard, ok := rule.GetShard().(router2.RangeShard); ok {
 				index, err := rule.FindTableIndex(v)
 				if err != nil {
 					return nil, err
@@ -889,7 +889,7 @@ func getFindTableIndexesFunc(op opcode.Op) func(rule router.Rule, columnName str
 }
 
 // copy from PlanBuilder.adjustShardIndex()
-func adjustShardIndex(s router.RangeShard, value interface{}, index int) int {
+func adjustShardIndex(s router2.RangeShard, value interface{}, index int) int {
 	if s.EqualStart(value, index) {
 		return index - 1
 	}
@@ -934,7 +934,7 @@ func handleBinaryOperationExprCompareLeftColumnRightColumn(p *TableAliasStmtInfo
 	return false, nil, expr, nil
 }
 
-func handleBinaryOperationExprCompareLeftColumnRightValue(p *TableAliasStmtInfo, expr *ast.BinaryOperationExpr, findTableIndexes func(router.Rule, string, interface{}) ([]int, error)) (bool, []int, ast.ExprNode, error) {
+func handleBinaryOperationExprCompareLeftColumnRightValue(p *TableAliasStmtInfo, expr *ast.BinaryOperationExpr, findTableIndexes func(router2.Rule, string, interface{}) ([]int, error)) (bool, []int, ast.ExprNode, error) {
 	column := expr.L.(*ast.ColumnNameExpr)
 	rule, need, isAlias, err := NeedCreateColumnNameExprDecoratorInCondition(p, column)
 	if err != nil {
@@ -947,7 +947,7 @@ func handleBinaryOperationExprCompareLeftColumnRightValue(p *TableAliasStmtInfo,
 	decorator := CreateColumnNameExprDecorator(column, rule, isAlias, p.GetRouteResult())
 	expr.L = decorator
 
-	if rule.GetType() == router.GlobalTableRuleType {
+	if rule.GetType() == router2.GlobalTableRuleType {
 		return false, nil, expr, nil
 	}
 
@@ -965,7 +965,7 @@ func handleBinaryOperationExprCompareLeftColumnRightValue(p *TableAliasStmtInfo,
 	return true, tableIndexes, expr, nil
 }
 
-func handleBinaryOperationExprCompareLeftValueRightColumn(p *TableAliasStmtInfo, expr *ast.BinaryOperationExpr, findTableIndexes func(router.Rule, string, interface{}) ([]int, error)) (bool, []int, ast.ExprNode, error) {
+func handleBinaryOperationExprCompareLeftValueRightColumn(p *TableAliasStmtInfo, expr *ast.BinaryOperationExpr, findTableIndexes func(router2.Rule, string, interface{}) ([]int, error)) (bool, []int, ast.ExprNode, error) {
 	column := expr.R.(*ast.ColumnNameExpr)
 	rule, need, isAlias, err := NeedCreateColumnNameExprDecoratorInCondition(p, column)
 	if err != nil {
@@ -978,7 +978,7 @@ func handleBinaryOperationExprCompareLeftValueRightColumn(p *TableAliasStmtInfo,
 	decorator := CreateColumnNameExprDecorator(column, rule, isAlias, p.GetRouteResult())
 	expr.R = decorator
 
-	if rule.GetType() == router.GlobalTableRuleType {
+	if rule.GetType() == router2.GlobalTableRuleType {
 		return false, nil, expr, nil
 	}
 

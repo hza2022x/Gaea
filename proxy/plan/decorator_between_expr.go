@@ -16,11 +16,11 @@ package plan
 
 import (
 	"fmt"
+	router2 "github.com/XiaoMi/Gaea/core/router"
 
 	"github.com/XiaoMi/Gaea/parser/ast"
 	"github.com/XiaoMi/Gaea/parser/format"
 	driver "github.com/XiaoMi/Gaea/parser/tidb-types/parser_driver"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/XiaoMi/Gaea/util"
 )
 
@@ -32,12 +32,12 @@ type BetweenExprDecorator struct {
 
 	tableIndexes []int
 
-	rule   router.Rule
+	rule   router2.Rule
 	result *RouteResult
 }
 
 // NeedCreateBetweenExprDecorator check if BetweenExpr needs decoration
-func NeedCreateBetweenExprDecorator(p *TableAliasStmtInfo, n *ast.BetweenExpr) (router.Rule, bool, bool, error) {
+func NeedCreateBetweenExprDecorator(p *TableAliasStmtInfo, n *ast.BetweenExpr) (router2.Rule, bool, bool, error) {
 	// 如果不是ColumnNameExpr, 则不做任何路由计算和装饰, 直接返回
 	columnNameExpr, ok := n.Expr.(*ast.ColumnNameExpr)
 	if !ok {
@@ -53,7 +53,7 @@ func NeedCreateBetweenExprDecorator(p *TableAliasStmtInfo, n *ast.BetweenExpr) (
 }
 
 // CreateBetweenExprDecorator create BetweenExprDecorator
-func CreateBetweenExprDecorator(n *ast.BetweenExpr, rule router.Rule, isAlias bool, result *RouteResult) (*BetweenExprDecorator, error) {
+func CreateBetweenExprDecorator(n *ast.BetweenExpr, rule router2.Rule, isAlias bool, result *RouteResult) (*BetweenExprDecorator, error) {
 	columnNameExpr := n.Expr.(*ast.ColumnNameExpr)
 	columnNameExprDecorator := CreateColumnNameExprDecorator(columnNameExpr, rule, isAlias, result)
 
@@ -102,9 +102,9 @@ func (b *BetweenExprDecorator) GetCurrentRouteResult() []int {
 	return b.tableIndexes
 }
 
-func getBetweenExprRouteResult(rule router.Rule, n *ast.BetweenExpr) ([]int, error) {
+func getBetweenExprRouteResult(rule router2.Rule, n *ast.BetweenExpr) ([]int, error) {
 	//如果是全局表, 则返回广播路由
-	if rule.GetType() == router.GlobalTableRuleType {
+	if rule.GetType() == router2.GlobalTableRuleType {
 		indexes := rule.GetSubTableIndexes()
 		return indexes, nil
 	}
@@ -117,7 +117,7 @@ func getBetweenExprRouteResult(rule router.Rule, n *ast.BetweenExpr) ([]int, err
 		return indexes, nil
 	}
 
-	if _, ok := rule.GetShard().(router.RangeShard); ok {
+	if _, ok := rule.GetShard().(router2.RangeShard); ok {
 		return getShardBetweenExprRouteResult(rule, n)
 	}
 
@@ -126,8 +126,8 @@ func getBetweenExprRouteResult(rule router.Rule, n *ast.BetweenExpr) ([]int, err
 }
 
 // copy from origin PlanBuilder.getRangeShardTableIndex
-func getShardBetweenExprRouteResult(rule router.Rule, n *ast.BetweenExpr) ([]int, error) {
-	rangeShard := rule.GetShard().(router.RangeShard)
+func getShardBetweenExprRouteResult(rule router2.Rule, n *ast.BetweenExpr) ([]int, error) {
+	rangeShard := rule.GetShard().(router2.RangeShard)
 
 	leftValueExpr, ok := n.Left.(*driver.ValueExpr)
 	if !ok {

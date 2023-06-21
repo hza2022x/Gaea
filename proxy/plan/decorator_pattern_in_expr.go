@@ -16,6 +16,7 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/router"
 	"io"
 	"sort"
 
@@ -23,7 +24,6 @@ import (
 	"github.com/XiaoMi/Gaea/parser/format"
 	driver "github.com/XiaoMi/Gaea/parser/tidb-types/parser_driver"
 	"github.com/XiaoMi/Gaea/parser/types"
-	"github.com/XiaoMi/Gaea/proxy/router"
 	"github.com/XiaoMi/Gaea/util"
 )
 
