@@ -19,6 +19,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/XiaoMi/Gaea/common"
+	"github.com/XiaoMi/Gaea/core/router"
 	"runtime"
 	"strings"
 	"time"
@@ -86,7 +87,7 @@ func (se *SessionExecutor) doQuery(reqCtx *util.RequestContext, sql string) (*my
 		return nil, fmt.Errorf("write DML is now allowed by read user")
 	}
 
-	if canHandleWithoutPlan(stmtType) {
+	if router.CanHandleWithoutPlan(stmtType) {
 		return se.handleQueryWithoutPlan(reqCtx, sql)
 	}
 
@@ -97,7 +98,7 @@ func (se *SessionExecutor) doQuery(reqCtx *util.RequestContext, sql string) (*my
 		return nil, fmt.Errorf("get plan error, db: %s, sql: %s, err: %v", db, sql, err)
 	}
 
-	if canExecuteFromSlave(se, sql) {
+	if CanExecuteFromSlave(se, sql) {
 		reqCtx.Set(util.FromSlave, 1)
 	}
 

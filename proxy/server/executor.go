@@ -36,8 +36,6 @@ import (
 )
 
 const (
-	// master comments
-	masterComment = "/*master*/"
 	// general query log variable
 	gaeaGeneralLogVariable = "gaea_general_log"
 )
@@ -557,16 +555,6 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 	return r, err
 }
 
-func canHandleWithoutPlan(stmtType int) bool {
-	return stmtType == parser.StmtShow ||
-		stmtType == parser.StmtSet ||
-		stmtType == parser.StmtBegin ||
-		stmtType == parser.StmtCommit ||
-		stmtType == parser.StmtRollback ||
-		stmtType == parser.StmtSavepoint ||
-		stmtType == parser.StmtUse
-}
-
 const variableRestoreFlag = format.RestoreKeyWordLowercase | format.RestoreNameLowercase
 
 // 获取SET语句中变量的字符串值, 去掉各种引号并转换为小写
@@ -587,8 +575,8 @@ func getOnOffVariable(v string) (string, error) {
 	}
 }
 
-// master-slave routing
-func canExecuteFromSlave(c *SessionExecutor, sql string) bool {
+// CanExecuteFromSlave master-slave routing
+func CanExecuteFromSlave(c *SessionExecutor, sql string) bool {
 	if parser.Preview(sql) != parser.StmtSelect {
 		return false
 	}
@@ -596,7 +584,7 @@ func canExecuteFromSlave(c *SessionExecutor, sql string) bool {
 	_, comments := parser.SplitMarginComments(sql)
 	lcomment := strings.ToLower(strings.TrimSpace(comments.Leading))
 	var fromSlave = c.GetNamespace().IsRWSplit(c.user)
-	if strings.ToLower(lcomment) == masterComment {
+	if strings.ToLower(lcomment) == common.MasterHint {
 		fromSlave = false
 	}
 
