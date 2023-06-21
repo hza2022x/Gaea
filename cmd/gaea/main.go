@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/core/executor"
 	"os"
 	"os/signal"
 	"sync"
@@ -55,7 +56,7 @@ func main() {
 	defer log.Close()
 
 	// init manager
-	mgr, err := server.LoadAndCreateManager(cfg)
+	mgr, err := executor.LoadAndCreateManager(cfg)
 	if err != nil {
 		log.Fatal("init manager failed, error: %v", err)
 		return

@@ -4,19 +4,20 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package server
+package executor
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/XiaoMi/Gaea/proxy/server"
 	"testing"
 
 	"github.com/XiaoMi/Gaea/backend"
@@ -29,7 +30,6 @@ import (
 	"github.com/XiaoMi/Gaea/util"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/ini.v1"
 )
 
 func TestGetVariableExprResult(t *testing.T) {
@@ -75,10 +75,10 @@ func TestExecute(t *testing.T) {
 	slice0SlavePool := new(mocks.ConnectionPool)
 	slice1MasterPool := new(mocks.ConnectionPool)
 	slice1SlavePool := new(mocks.ConnectionPool)
-	se.manager.GetNamespace("test_executor_namespace").slices["slice-0"].Master = slice0MasterPool
-	se.manager.GetNamespace("test_executor_namespace").slices["slice-0"].Slave = []backend.ConnectionPool{slice0SlavePool}
-	se.manager.GetNamespace("test_executor_namespace").slices["slice-1"].Master = slice1MasterPool
-	se.manager.GetNamespace("test_executor_namespace").slices["slice-1"].Slave = []backend.ConnectionPool{slice1SlavePool}
+	se.Manager.GetNamespace("test_executor_namespace").slices["slice-0"].Master = slice0MasterPool
+	se.Manager.GetNamespace("test_executor_namespace").slices["slice-0"].Slave = []backend.ConnectionPool{slice0SlavePool}
+	se.Manager.GetNamespace("test_executor_namespace").slices["slice-1"].Master = slice1MasterPool
+	se.Manager.GetNamespace("test_executor_namespace").slices["slice-1"].Slave = []backend.ConnectionPool{slice1SlavePool}
 
 	expectResult1 := &mysql.Result{}
 	expectResult2 := &mysql.Result{}
@@ -91,7 +91,7 @@ func TestExecute(t *testing.T) {
 	slice0MasterConn.On("SetCharset", "utf8", mysql.CharsetIds["utf8"]).Return(false, nil)
 	slice0MasterConn.On("SetSessionVariables", mysql.NewSessionVariables()).Return(false, nil)
 	slice0MasterConn.On("GetAddr").Return("127.0.0.1:3306")
-	slice0MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", defaultMaxSqlResultSize).Return(expectResult1, nil)
+	slice0MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", server.defaultMaxSqlResultSize).Return(expectResult1, nil)
 	slice0MasterConn.On("Recycle").Return(nil)
 
 	//slice-1
@@ -102,7 +102,7 @@ func TestExecute(t *testing.T) {
 	slice1MasterConn.On("SetCharset", "utf8", mysql.CharsetIds["utf8"]).Return(false, nil)
 	slice1MasterConn.On("SetSessionVariables", mysql.NewSessionVariables()).Return(false, nil)
 	slice1MasterConn.On("GetAddr").Return("127.0.0.1:3306")
-	slice1MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", defaultMaxSqlResultSize).Return(expectResult2, nil)
+	slice1MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", server.defaultMaxSqlResultSize).Return(expectResult2, nil)
 	slice1MasterConn.On("Recycle").Return(nil)
 
 	sqls := map[string]map[string][]string{

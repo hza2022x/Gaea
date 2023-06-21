@@ -15,6 +15,7 @@
 package server
 
 import (
+	"github.com/XiaoMi/Gaea/core/executor"
 	"net"
 	"runtime"
 	"strconv"
@@ -41,14 +42,14 @@ type Server struct {
 	sessionTimeout time.Duration
 	tw             *util.TimeWheel
 	adminServer    *AdminServer
-	manager        *Manager
+	manager        *executor.Manager
 	EncryptKey     string
 	ServerVersion  string
 	AuthPlugin     string
 }
 
 // NewServer create new server
-func NewServer(cfg *models.Proxy, manager *Manager) (*Server, error) {
+func NewServer(cfg *models.Proxy, manager *executor.Manager) (*Server, error) {
 	var err error
 	s := new(Server)
 
@@ -143,10 +144,10 @@ func (s *Server) onConn(c net.Conn) {
 	s.tw.Add(s.sessionTimeout, cc, cc.Close)
 	log.Notice("Connected conn_id=%d, %s@%s (%s) namespace:%s capability: %d",
 		cc.c.ConnectionID,
-		cc.executor.user,
-		cc.executor.clientAddr,
-		cc.executor.db,
-		cc.executor.namespace,
+		cc.executor.User,
+		cc.executor.ClientAddr,
+		cc.executor.Db,
+		cc.executor.Namespace,
 		cc.c.capability)
 	cc.Run()
 }

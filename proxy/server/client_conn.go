@@ -16,10 +16,14 @@ package server
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/executor"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"strings"
 )
+
+var p = &mysql.Field{Name: []byte("?")}
+var c = &mysql.Field{}
 
 // ClientConn session client connection
 type ClientConn struct {
@@ -27,7 +31,7 @@ type ClientConn struct {
 
 	salt []byte
 
-	manager *Manager
+	manager *executor.Manager
 
 	capability uint32
 
@@ -47,7 +51,7 @@ type HandshakeResponseInfo struct {
 }
 
 // NewClientConn constructor of ClientConn
-func NewClientConn(c *mysql.Conn, manager *Manager) *ClientConn {
+func NewClientConn(c *mysql.Conn, manager *executor.Manager) *ClientConn {
 	salt, _ := mysql.RandomBuf(20)
 	return &ClientConn{
 		Conn:    c,
@@ -116,7 +120,7 @@ func (cc *ClientConn) writeInitialHandshakeV10() error {
 	pos = mysql.WriteByte(data, pos, byte(mysql.DefaultCollationID))
 
 	// Status flag.
-	pos = mysql.WriteUint16(data, pos, initClientConnStatus)
+	pos = mysql.WriteUint16(data, pos, executor.InitClientConnStatus)
 
 	// Upper part of the capability flags.
 	pos = mysql.WriteUint16(data, pos, uint16(DefaultCapability>>16))
@@ -427,7 +431,7 @@ func (cc *ClientConn) writeColumnDefinition(field *mysql.Field) error {
 }
 
 // writePrepareResponse write prepare response
-func (cc *ClientConn) writePrepareResponse(status uint16, s *Stmt) error {
+func (cc *ClientConn) writePrepareResponse(status uint16, s *executor.Stmt) error {
 	var err error
 	length := 1 + // status
 		4 + // statement-id
@@ -440,11 +444,11 @@ func (cc *ClientConn) writePrepareResponse(status uint16, s *Stmt) error {
 	// status ok
 	pos = mysql.WriteByte(data, pos, 0)
 	// stmt id
-	pos = mysql.WriteUint32(data, pos, s.id)
+	pos = mysql.WriteUint32(data, pos, s.Id)
 	// number columns
-	pos = mysql.WriteUint16(data, pos, uint16(s.columnCount))
+	pos = mysql.WriteUint16(data, pos, uint16(s.ColumnCount))
 	// number params
-	pos = mysql.WriteUint16(data, pos, uint16(s.paramCount))
+	pos = mysql.WriteUint16(data, pos, uint16(s.ParamCount))
 	// filler [00]
 	pos = mysql.WriteByte(data, pos, 0)
 	// number of warnings
@@ -458,8 +462,8 @@ func (cc *ClientConn) writePrepareResponse(status uint16, s *Stmt) error {
 		return err
 	}
 
-	if s.paramCount > 0 {
-		for i := 0; i < s.paramCount; i++ {
+	if s.ParamCount > 0 {
+		for i := 0; i < s.ParamCount; i++ {
 			err = cc.writeColumnDefinition(p)
 			if err != nil {
 				return err
@@ -469,8 +473,8 @@ func (cc *ClientConn) writePrepareResponse(status uint16, s *Stmt) error {
 		return err
 	}
 
-	if s.columnCount > 0 {
-		for i := 0; i < s.columnCount; i++ {
+	if s.ColumnCount > 0 {
+		for i := 0; i < s.ColumnCount; i++ {
 			err = cc.writeColumnDefinition(c)
 			if err != nil {
 				return err

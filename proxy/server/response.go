@@ -1,6 +1,9 @@
 package server
 
-import "github.com/XiaoMi/Gaea/mysql"
+import (
+	"github.com/XiaoMi/Gaea/core/executor"
+	"github.com/XiaoMi/Gaea/mysql"
+)
 
 // Response response info
 type Response struct {
@@ -62,7 +65,7 @@ func CreateFieldListResponse(status uint16, fl []*mysql.Field) Response {
 }
 
 // CreatePrepareResponse create prepare response
-func CreatePrepareResponse(status uint16, stmt *Stmt) Response {
+func CreatePrepareResponse(status uint16, stmt *executor.Stmt) Response {
 	return Response{
 		RespType: RespPrepare,
 		Status:   status,

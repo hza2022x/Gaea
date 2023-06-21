@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package server
+package executor
 
 import (
 	"bytes"
@@ -300,7 +300,7 @@ func (m *Manager) ConfigFingerprint() string {
 // RecordSessionSQLMetrics record session SQL metrics, like response time, error
 func (m *Manager) RecordSessionSQLMetrics(reqCtx *util.RequestContext, se *SessionExecutor, sql string, startTime time.Time, err error) {
 	trimmedSql := strings.ReplaceAll(sql, "\n", " ")
-	namespace := se.namespace
+	namespace := se.Namespace
 	ns := m.GetNamespace(namespace)
 	if ns == nil {
 		log.Warn("record session SQL metrics error, namespace: %s, sql: %s, err: %s", namespace, trimmedSql, "namespace not found")
@@ -339,7 +339,7 @@ func (m *Manager) RecordSessionSQLMetrics(reqCtx *util.RequestContext, se *Sessi
 
 	if OpenProcessGeneralQueryLog() && ns.openGeneralLog {
 		m.statistics.generalLogger.Notice("client: %s, namespace: %s, db: %s, user: %s, cmd: %s, sql: %s, cost: %d ms, succ: %t",
-			se.clientAddr, namespace, se.db, se.user, operation, trimmedSql, duration, err == nil)
+			se.ClientAddr, namespace, se.Db, se.User, operation, trimmedSql, duration, err == nil)
 	}
 }
 

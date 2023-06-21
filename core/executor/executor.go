@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package server
+package executor
 
 import (
 	"context"
 	"fmt"
 	common "github.com/XiaoMi/Gaea/common/constant"
 	"github.com/XiaoMi/Gaea/core/router"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -37,20 +38,20 @@ import (
 )
 
 const (
-	// general query log variable
-	generalLogVariable = "general_log"
+	GeneralLogVariable   = "general_log"
+	InitClientConnStatus = mysql.ServerStatusAutocommit
 )
 
 // SessionExecutor is bound to a session, so requests are serializable
 type SessionExecutor struct {
-	manager *Manager
+	Manager *Manager
 
-	namespace  string
-	user       string
-	db         string
-	clientAddr string
+	Namespace  string
+	User       string
+	Db         string
+	ClientAddr string
 
-	status       uint16
+	Status       uint16
 	lastInsertID uint64
 
 	collation        mysql.CollationID
@@ -67,21 +68,9 @@ type SessionExecutor struct {
 	parser *parser.Parser
 }
 
-func newSessionExecutor(manager *Manager) *SessionExecutor {
-
-	return &SessionExecutor{
-		sessionVariables: mysql.NewSessionVariables(),
-		txConns:          make(map[string]backend.PooledConnect),
-		stmts:            make(map[uint32]*Stmt),
-		parser:           parser.New(),
-		status:           initClientConnStatus,
-		manager:          manager,
-	}
-}
-
 // GetNamespace return namespace in session
 func (se *SessionExecutor) GetNamespace() *Namespace {
-	return se.manager.GetNamespace(se.namespace)
+	return se.Manager.GetNamespace(se.Namespace)
 }
 
 // GetVariables return variables in session
@@ -135,12 +124,12 @@ func (se *SessionExecutor) SetLastInsertID(id uint64) {
 
 // GetStatus return session status
 func (se *SessionExecutor) GetStatus() uint16 {
-	return se.status
+	return se.Status
 }
 
 // SetStatus store status
 func (se *SessionExecutor) SetStatus(status uint16) {
-	se.status = status
+	se.Status = status
 }
 
 // SetCollationID store collation id
@@ -150,7 +139,7 @@ func (se *SessionExecutor) SetCollationID(id mysql.CollationID) {
 
 // SetNamespaceDefaultCollationID store default collation id
 func (se *SessionExecutor) SetNamespaceDefaultCollationID() {
-	se.collation = se.manager.GetNamespace(se.namespace).GetDefaultCollationID()
+	se.collation = se.Manager.GetNamespace(se.Namespace).GetDefaultCollationID()
 }
 
 // GetCollationID return collation id
@@ -165,7 +154,7 @@ func (se *SessionExecutor) SetCharset(charset string) {
 
 // SetNamespaceDefaultCharset set session default charset
 func (se SessionExecutor) SetNamespaceDefaultCharset() {
-	se.charset = se.manager.GetNamespace(se.namespace).GetDefaultCharset()
+	se.charset = se.Manager.GetNamespace(se.Namespace).GetDefaultCharset()
 }
 
 // GetCharset return charset
@@ -175,12 +164,12 @@ func (se *SessionExecutor) GetCharset() string {
 
 // SetDatabase set session database
 func (se *SessionExecutor) SetDatabase(db string) {
-	se.db = db
+	se.Db = db
 }
 
 // GetDatabase return database in session
 func (se *SessionExecutor) GetDatabase() string {
-	return se.db
+	return se.Db
 }
 
 func (se *SessionExecutor) getBackendConns(sqls map[string]map[string][]string, fromSlave bool) (pcs map[string]backend.PooledConnect, err error) {
@@ -199,7 +188,7 @@ func (se *SessionExecutor) getBackendConns(sqls map[string]map[string][]string, 
 func (se *SessionExecutor) getBackendConn(sliceName string, fromSlave bool) (pc backend.PooledConnect, err error) {
 	if !se.isInTransaction() {
 		slice := se.GetNamespace().GetSlice(sliceName)
-		return slice.GetConn(fromSlave, se.GetNamespace().GetUserProperty(se.user))
+		return slice.GetConn(fromSlave, se.GetNamespace().GetUserProperty(se.User))
 	}
 	return se.getTransactionConn(sliceName)
 }
@@ -308,7 +297,7 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 
 	var ctx = context.Background()
 	var cancel context.CancelFunc
-	maxExecuteTime := se.manager.GetNamespace(se.namespace).GetMaxExecuteTime()
+	maxExecuteTime := se.Manager.GetNamespace(se.Namespace).GetMaxExecuteTime()
 	if maxExecuteTime > 0 {
 		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(maxExecuteTime)*time.Millisecond)
 		defer cancel()
@@ -340,8 +329,8 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 			}
 			for _, v := range sqls {
 				startTime := time.Now()
-				r, err := pc.Execute(v, se.manager.GetNamespace(se.namespace).GetMaxResultSize())
-				se.manager.RecordBackendSQLMetrics(reqCtx, se.namespace, v, pc.GetAddr(), startTime, err)
+				r, err := pc.Execute(v, se.Manager.GetNamespace(se.Namespace).GetMaxResultSize())
+				se.Manager.RecordBackendSQLMetrics(reqCtx, se.Namespace, v, pc.GetAddr(), startTime, err)
 				if err != nil {
 					rs[i] = err
 				} else {
@@ -369,7 +358,7 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 		case <-ctx.Done():
 			for sliceName, pc := range pcsUnCompleted {
 				connID := pc.GetConnectionID()
-				dc, err := se.manager.GetNamespace(se.namespace).GetSlice(sliceName).GetDirectConn(pc.GetAddr())
+				dc, err := se.Manager.GetNamespace(se.Namespace).GetSlice(sliceName).GetDirectConn(pc.GetAddr())
 				if err != nil {
 					log.Warn("kill thread id: %d failed, get connection err: %v", connID, err.Error())
 					continue
@@ -416,12 +405,12 @@ func canExecuteFromSlave(c *SessionExecutor, sql string) bool {
 	if !result {
 		return false
 	}
-	return c.GetNamespace().IsRWSplit(c.user)
+	return c.GetNamespace().IsRWSplit(c.User)
 }
 
 // 如果是只读用户, 且SQL是INSERT, UPDATE, DELETE, 则拒绝执行, 返回true
 func isSQLNotAllowedByUser(c *SessionExecutor, stmtType int) bool {
-	if c.GetNamespace().IsAllowWrite(c.user) {
+	if c.GetNamespace().IsAllowWrite(c.User) {
 		return false
 	}
 
@@ -456,7 +445,7 @@ func createShowGeneralLogResult() *mysql.Result {
 	r := new(mysql.Resultset)
 
 	field := &mysql.Field{}
-	field.Name = hack.Slice(generalLogVariable)
+	field.Name = hack.Slice(GeneralLogVariable)
 	r.Fields = append(r.Fields, field)
 
 	var value string
@@ -485,12 +474,12 @@ func getFromSlave(reqCtx *util.RequestContext) bool {
 }
 
 func (se *SessionExecutor) isInTransaction() bool {
-	return se.status&mysql.ServerStatusInTrans > 0 ||
+	return se.Status&mysql.ServerStatusInTrans > 0 ||
 		!se.isAutoCommit()
 }
 
 func (se *SessionExecutor) isAutoCommit() bool {
-	return se.status&mysql.ServerStatusAutocommit > 0
+	return se.Status&mysql.ServerStatusAutocommit > 0
 }
 
 func (se *SessionExecutor) handleBegin() error {
@@ -502,7 +491,7 @@ func (se *SessionExecutor) handleBegin() error {
 			return err
 		}
 	}
-	se.status |= mysql.ServerStatusInTrans
+	se.Status |= mysql.ServerStatusInTrans
 	se.savepoints = []string{}
 	return nil
 }
@@ -515,9 +504,9 @@ func (se *SessionExecutor) handleCommit() (err error) {
 
 }
 
-func (se *SessionExecutor) handleRollback(stmt *ast.RollbackStmt) (err error) {
+func (se *SessionExecutor) HandleRollback(stmt *ast.RollbackStmt) (err error) {
 	if stmt == nil || stmt.Savepoint == "" {
-		return se.rollback()
+		return se.Rollback()
 	} else {
 		return se.rollbackSavepoint(stmt.Savepoint)
 	}
@@ -527,7 +516,7 @@ func (se *SessionExecutor) commit() (err error) {
 	se.txLock.Lock()
 	defer se.txLock.Unlock()
 
-	se.status &= ^mysql.ServerStatusInTrans
+	se.Status &= ^mysql.ServerStatusInTrans
 
 	for _, pc := range se.txConns {
 		if e := pc.Commit(); e != nil {
@@ -541,10 +530,10 @@ func (se *SessionExecutor) commit() (err error) {
 	return
 }
 
-func (se *SessionExecutor) rollback() (err error) {
+func (se *SessionExecutor) Rollback() (err error) {
 	se.txLock.Lock()
 	defer se.txLock.Unlock()
-	se.status &= ^mysql.ServerStatusInTrans
+	se.Status &= ^mysql.ServerStatusInTrans
 	for _, pc := range se.txConns {
 		err = pc.Rollback()
 		pc.Recycle()
@@ -642,4 +631,154 @@ func (se *SessionExecutor) ExecuteSQLs(reqCtx *util.RequestContext, sqls map[str
 		return nil, err
 	}
 	return rs, nil
+}
+
+// Parse parse sql
+func (se *SessionExecutor) Parse(sql string) (ast.StmtNode, error) {
+	return se.parser.ParseOneStmt(sql, "", "")
+}
+
+// 处理query语句
+func (se *SessionExecutor) HandleQuery(sql string) (r *mysql.Result, err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			log.Warn("handle query command failed, error: %v, sql: %s", e, sql)
+
+			if err, ok := e.(error); ok {
+				const size = 4096
+				buf := make([]byte, size)
+				buf = buf[:runtime.Stack(buf, false)]
+
+				log.Warn("handle query command catch panic error, sql: %s, error: %s, stack: %s",
+					sql, err.Error(), string(buf))
+			}
+
+			err = common.ErrInternalServer
+			return
+		}
+	}()
+
+	sql = strings.TrimRight(sql, ";") //删除sql语句最后的分号
+
+	reqCtx := util.NewRequestContext()
+	// check black sql
+	ns := se.GetNamespace()
+	if !ns.IsSQLAllowed(reqCtx, sql) {
+		fingerprint := mysql.GetFingerprint(sql)
+		log.Warn("catch black sql, sql: %s", sql)
+		se.Manager.GetStatisticManager().RecordSQLForbidden(fingerprint, se.GetNamespace().GetName())
+		err := mysql.NewError(mysql.ErrUnknown, "sql in blacklist")
+		return nil, err
+	}
+
+	startTime := time.Now()
+	stmtType := parser.Preview(sql)
+	reqCtx.Set(util.StmtType, stmtType)
+
+	r, err = se.doQuery(reqCtx, sql)
+	se.Manager.RecordSessionSQLMetrics(reqCtx, se, sql, startTime, err)
+	return r, err
+}
+
+func (se *SessionExecutor) doQuery(reqCtx *util.RequestContext, sql string) (*mysql.Result, error) {
+	stmtType := reqCtx.Get("stmtType").(int)
+
+	if isSQLNotAllowedByUser(se, stmtType) {
+		return nil, fmt.Errorf("write DML is now allowed by read user")
+	}
+
+	if router.CanHandleWithoutPlan(stmtType) {
+		return se.handleQueryWithoutPlan(reqCtx, sql)
+	}
+
+	db := se.Db
+
+	p, err := se.getPlan(se.GetNamespace(), db, sql)
+	if err != nil {
+		return nil, fmt.Errorf("get plan error, db: %s, sql: %s, err: %v", db, sql, err)
+	}
+
+	if canExecuteFromSlave(se, sql) {
+		reqCtx.Set(util.FromSlave, 1)
+	}
+
+	reqCtx.Set(util.DefaultSlice, se.GetNamespace().GetDefaultSlice())
+	r, err := p.ExecuteIn(reqCtx, se)
+	if err != nil {
+		log.Warn("execute select: %s", err.Error())
+		return nil, err
+	}
+
+	modifyResultStatus(r, se)
+
+	return r, nil
+}
+
+// 处理逻辑较简单的SQL, 不走执行计划部分
+func (se *SessionExecutor) handleQueryWithoutPlan(reqCtx *util.RequestContext, sql string) (*mysql.Result, error) {
+	n, err := se.Parse(sql)
+	if err != nil {
+		return nil, fmt.Errorf("parse sql error, sql: %s, err: %v", sql, err)
+	}
+
+	switch stmt := n.(type) {
+	case *ast.ShowStmt:
+		return se.handleShow(reqCtx, sql, stmt)
+	case *ast.SetStmt:
+		return se.handleSet(reqCtx, sql, stmt)
+	case *ast.BeginStmt:
+		return nil, se.handleBegin()
+	case *ast.CommitStmt:
+		return nil, se.handleCommit()
+	case *ast.RollbackStmt:
+		return nil, se.HandleRollback(stmt)
+	case *ast.SavepointStmt:
+		return nil, se.handleSavepoint(stmt)
+	case *ast.UseStmt:
+		return nil, se.HandleUseDB(stmt.DBName)
+	default:
+		return nil, fmt.Errorf("cannot handle sql without plan, ns: %s, sql: %s", se.Namespace, sql)
+	}
+}
+
+func (se *SessionExecutor) HandleUseDB(dbName string) error {
+	if len(dbName) == 0 {
+		return fmt.Errorf("must have database, the length of dbName is zero")
+	}
+
+	if se.GetNamespace().IsAllowedDB(dbName) {
+		se.Db = dbName
+		return nil
+	}
+
+	return mysql.NewDefaultError(mysql.ErrNoDB)
+}
+
+func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan.Plan, error) {
+	n, err := se.Parse(sql)
+	if err != nil {
+		return nil, fmt.Errorf("parse sql error, sql: %s, err: %v", sql, err)
+	}
+
+	rt := ns.GetRouter()
+	seq := ns.GetSequences()
+	phyDBs := ns.GetPhysicalDBs()
+	p, err := plan.BuildPlan(n, phyDBs, db, sql, rt, seq)
+	if err != nil {
+		return nil, fmt.Errorf("create select plan error: %v", err)
+	}
+
+	return p, nil
+}
+
+func NewSessionExecutor(manager *Manager) *SessionExecutor {
+
+	return &SessionExecutor{
+		sessionVariables: mysql.NewSessionVariables(),
+		txConns:          make(map[string]backend.PooledConnect),
+		stmts:            make(map[uint32]*Stmt),
+		parser:           parser.New(),
+		Status:           InitClientConnStatus,
+		Manager:          manager,
+	}
 }

@@ -26,7 +26,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package server
+package executor
 
 import (
 	"encoding/binary"
@@ -38,9 +38,6 @@ import (
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/util"
 )
-
-var p = &mysql.Field{Name: []byte("?")}
-var c = &mysql.Field{}
 
 func calcParams(sql string) (paramCount int, offsets []int, err error) {
 	count := 0
@@ -72,7 +69,6 @@ func calcParams(sql string) (paramCount int, offsets []int, err error) {
 
 	return
 }
-
 func escapeSQL(sql string) string {
 	t := make([]byte, 0, len(sql))
 	for _, elem := range []byte(sql) {
@@ -86,18 +82,18 @@ func escapeSQL(sql string) string {
 
 // Stmt prepare statement struct
 type Stmt struct {
-	id          uint32
+	Id          uint32
 	sql         string
 	args        []interface{}
-	columnCount int
-	paramCount  int
+	ColumnCount int
+	ParamCount  int
 	paramTypes  []byte
 	offsets     []int
 }
 
 // ResetParams reset args
 func (s *Stmt) ResetParams() {
-	s.args = make([]interface{}, s.paramCount)
+	s.args = make([]interface{}, s.ParamCount)
 }
 
 func (s *Stmt) SetParamTypes(paramTypes []byte) {
@@ -115,7 +111,7 @@ func (s *Stmt) GetRewriteSQL() (string, error) {
 	var pos = 0
 	var offset = 0
 	var quote = false
-	for i := 0; i < s.paramCount; i++ {
+	for i := 0; i < s.ParamCount; i++ {
 		quote, tmp = util.ItoString(s.args[i])
 		tmp = escapeSQL(tmp)
 		pos = s.offsets[i]
@@ -130,7 +126,7 @@ func (s *Stmt) GetRewriteSQL() (string, error) {
 	return sql, nil
 }
 
-func (se *SessionExecutor) handleStmtExecute(data []byte) (*mysql.Result, error) {
+func (se *SessionExecutor) HandleStmtExecute(data []byte) (*mysql.Result, error) {
 	if len(data) < 9 {
 		return nil, mysql.ErrMalformPacket
 	}
@@ -159,12 +155,12 @@ func (se *SessionExecutor) handleStmtExecute(data []byte) (*mysql.Result, error)
 	var paramTypes []byte
 	var paramValues []byte
 
-	paramNum := s.paramCount
+	paramNum := s.ParamCount
 
 	var executeSQL string
 	var err error
 	if paramNum > 0 {
-		nullBitmapLen := (s.paramCount + 7) >> 3
+		nullBitmapLen := (s.ParamCount + 7) >> 3
 		if len(data) < (pos + nullBitmapLen + 1) {
 			return nil, mysql.ErrMalformPacket
 		}
@@ -202,7 +198,7 @@ func (se *SessionExecutor) handleStmtExecute(data []byte) (*mysql.Result, error)
 	defer s.ResetParams()
 
 	// execute sql using ComQuery
-	r, err := se.handleQuery(executeSQL)
+	r, err := se.HandleQuery(executeSQL)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +224,7 @@ func (se *SessionExecutor) bindStmtArgs(s *Stmt, nullBitmap, paramTypes, paramVa
 	var v []byte
 	var isNull bool
 
-	for i := 0; i < s.paramCount; i++ {
+	for i := 0; i < s.ParamCount; i++ {
 		if nullBitmap[i>>3]&(1<<(uint(i)%8)) > 0 {
 			args[i] = nil
 			continue
@@ -350,7 +346,7 @@ func (se *SessionExecutor) bindStmtArgs(s *Stmt, nullBitmap, paramTypes, paramVa
 	return nil
 }
 
-func (se *SessionExecutor) handleStmtSendLongData(data []byte) error {
+func (se *SessionExecutor) HandleStmtSendLongData(data []byte) error {
 	if len(data) < 6 {
 		return mysql.ErrMalformPacket
 	}
@@ -364,7 +360,7 @@ func (se *SessionExecutor) handleStmtSendLongData(data []byte) error {
 	}
 
 	paramID := binary.LittleEndian.Uint16(data[4:6])
-	if paramID >= uint16(s.paramCount) {
+	if paramID >= uint16(s.ParamCount) {
 		return mysql.NewDefaultError(mysql.ErrWrongArguments, "stmt_send_longdata")
 	}
 
@@ -384,7 +380,7 @@ func (se *SessionExecutor) handleStmtSendLongData(data []byte) error {
 	return nil
 }
 
-func (se *SessionExecutor) handleStmtReset(data []byte) error {
+func (se *SessionExecutor) HandleStmtReset(data []byte) error {
 	if len(data) < 4 {
 		return mysql.ErrMalformPacket
 	}

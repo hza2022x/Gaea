@@ -16,6 +16,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/executor"
 	"net"
 	"runtime"
 	"strings"
@@ -37,8 +38,6 @@ var DefaultCapability = mysql.ClientLongPassword | mysql.ClientLongFlag |
 
 var baseConnID uint32 = 10000
 
-const initClientConnStatus = mysql.ServerStatusAutocommit
-
 // Session means session between client and proxy
 type Session struct {
 	sync.Mutex
@@ -46,11 +45,11 @@ type Session struct {
 	c     *ClientConn
 	proxy *Server
 
-	manager *Manager
+	manager *executor.Manager
 
 	namespace string
 
-	executor *SessionExecutor
+	executor *executor.SessionExecutor
 
 	closed atomic.Value
 }
@@ -73,13 +72,13 @@ func newSession(s *Server, co net.Conn) *Session {
 	cc.c.SetConnectionID(atomic.AddUint32(&baseConnID, 1))
 	cc.c.proxy = s
 
-	cc.executor = newSessionExecutor(s.manager)
-	cc.executor.clientAddr = co.RemoteAddr().String()
+	cc.executor = executor.NewSessionExecutor(s.manager)
+	cc.executor.ClientAddr = co.RemoteAddr().String()
 	cc.closed.Store(false)
 	return cc
 }
 
-func (cc *Session) getNamespace() *Namespace {
+func (cc *Session) getNamespace() *executor.Namespace {
 	return cc.manager.GetNamespace(cc.namespace)
 }
 
@@ -156,7 +155,7 @@ func (cc *Session) handleHandshakeResponse(info HandshakeResponseInfo) error {
 	if !cc.manager.CheckUser(user) {
 		return mysql.NewDefaultError(mysql.ErrAccessDenied, user, cc.c.RemoteAddr().String(), "Yes")
 	}
-	cc.executor.user = user
+	cc.executor.User = user
 
 	// check password
 	if len(info.AuthPlugin) == 0 {
@@ -194,7 +193,7 @@ func (cc *Session) handleHandshakeResponse(info HandshakeResponseInfo) error {
 	// set namespace
 	namespace := cc.manager.GetNamespaceByUser(user, password)
 	cc.namespace = namespace
-	cc.executor.namespace = namespace
+	cc.executor.Namespace = namespace
 	cc.c.namespace = namespace // TODO: remove it when refactor is done
 	return nil
 }
@@ -205,7 +204,7 @@ func (cc *Session) Close() {
 		return
 	}
 	cc.closed.Store(true)
-	if err := cc.executor.rollback(); err != nil {
+	if err := cc.executor.Rollback(); err != nil {
 		log.Warn("executor rollback error when Session close: %v", err)
 	}
 	cc.c.Close()
@@ -276,7 +275,7 @@ func (cc *Session) writeResponse(r Response) error {
 		}
 		return cc.c.writeOKResult(r.Status, r.Data.(*mysql.Result))
 	case RespPrepare:
-		stmt := r.Data.(*Stmt)
+		stmt := r.Data.(*executor.Stmt)
 		if stmt == nil {
 			return cc.c.writeOK(r.Status)
 		}
