@@ -177,7 +177,7 @@ func (se *SessionExecutor) handleShow(reqCtx *util.RequestContext, sql string, s
 		dbs := se.GetNamespace().GetAllowedDBs()
 		return createShowDatabaseResult(dbs), nil
 	case ast.ShowVariables:
-		if strings.Contains(sql, gaeaGeneralLogVariable) {
+		if strings.Contains(sql, generalLogVariable) {
 			return createShowGeneralLogResult(), nil
 		}
 		fallthrough
@@ -291,7 +291,7 @@ func (se *SessionExecutor) handleSetVariable(v *ast.VariableAssignment) error {
 		// unsupported
 	case "transaction":
 		return fmt.Errorf("does not support set transaction in gaea")
-	case gaeaGeneralLogVariable:
+	case generalLogVariable:
 		value := getVariableExprResult(v.Value)
 		onOffValue, err := util.GetOnOffVariable(value)
 		if err != nil {

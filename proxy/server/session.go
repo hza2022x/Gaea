@@ -250,7 +250,7 @@ func (cc *Session) Run() {
 
 		cmd := data[0]
 		data = data[1:]
-		rs := cc.executor.ExecuteCommand(cmd, data)
+		rs := ExecuteCommand(cmd, data, cc.executor)
 		cc.c.RecycleReadPacket()
 
 		if err = cc.writeResponse(rs); err != nil {

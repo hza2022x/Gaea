@@ -38,7 +38,7 @@ import (
 
 const (
 	// general query log variable
-	gaeaGeneralLogVariable = "gaea_general_log"
+	generalLogVariable = "general_log"
 )
 
 // SessionExecutor is bound to a session, so requests are serializable
@@ -65,89 +65,6 @@ type SessionExecutor struct {
 	stmts  map[uint32]*Stmt //prepare相关,client端到proxy的stmt
 
 	parser *parser.Parser
-}
-
-// Response response info
-type Response struct {
-	RespType int
-	Status   uint16
-	Data     interface{}
-}
-
-const (
-	// RespOK means OK message
-	RespOK = iota
-	// RespResult means Result message
-	RespResult
-	// RespError means error message
-	RespError
-	// RespFieldList means field list message
-	RespFieldList
-	// RespPrepare prepare response message
-	RespPrepare
-	// RespEOF means EOF message
-	RespEOF
-	// RespNoop means empty message
-	RespNoop
-)
-
-// CreateOKResponse create ok response
-func CreateOKResponse(status uint16) Response {
-	return Response{
-		RespType: RespOK,
-		Status:   status,
-	}
-}
-
-// CreateResultResponse create result response
-func CreateResultResponse(status uint16, result *mysql.Result) Response {
-	return Response{
-		RespType: RespResult,
-		Status:   status,
-		Data:     result,
-	}
-}
-
-// CreateErrorResponse create error response
-func CreateErrorResponse(status uint16, err error) Response {
-	return Response{
-		RespType: RespError,
-		Status:   status,
-		Data:     err,
-	}
-}
-
-// CreateFieldListResponse create field list response
-func CreateFieldListResponse(status uint16, fl []*mysql.Field) Response {
-	return Response{
-		RespType: RespFieldList,
-		Status:   status,
-		Data:     fl,
-	}
-}
-
-// CreatePrepareResponse create prepare response
-func CreatePrepareResponse(status uint16, stmt *Stmt) Response {
-	return Response{
-		RespType: RespPrepare,
-		Status:   status,
-		Data:     stmt,
-	}
-}
-
-// CreateEOFResponse create eof response
-func CreateEOFResponse(status uint16) Response {
-	return Response{
-		RespType: RespEOF,
-		Status:   status,
-	}
-}
-
-// CreateNoopResponse no op response, for ComStmtClose
-func CreateNoopResponse() Response {
-	return Response{
-		RespType: RespNoop,
-	}
 }
 
 func newSessionExecutor(manager *Manager) *SessionExecutor {
@@ -264,79 +181,6 @@ func (se *SessionExecutor) SetDatabase(db string) {
 // GetDatabase return database in session
 func (se *SessionExecutor) GetDatabase() string {
 	return se.db
-}
-
-// ExecuteCommand execute command
-func (se *SessionExecutor) ExecuteCommand(cmd byte, data []byte) Response {
-	switch cmd {
-	case mysql.ComQuit:
-		se.handleRollback(nil)
-		// https://dev.mysql.com/doc/internals/en/com-quit.html
-		// either a connection close or a OK_Packet, OK_Packet will cause client RST sometimes, but doesn't affect sql execute
-		return CreateNoopResponse()
-	case mysql.ComQuery: // data type: string[EOF]
-		sql := string(data)
-		// handle phase
-		r, err := se.handleQuery(sql)
-		if err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateResultResponse(se.status, r)
-	case mysql.ComPing:
-		return CreateOKResponse(se.status)
-	case mysql.ComInitDB:
-		db := string(data)
-		// handle phase
-		err := se.handleUseDB(db)
-		if err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateOKResponse(se.status)
-	case mysql.ComFieldList:
-		fs, err := se.handleFieldList(data)
-		if err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateFieldListResponse(se.status, fs)
-	case mysql.ComStmtPrepare:
-		sql := string(data)
-		stmt, err := se.handleStmtPrepare(sql)
-		if err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreatePrepareResponse(se.status, stmt)
-	case mysql.ComStmtExecute:
-		values := make([]byte, len(data))
-		copy(values, data)
-		r, err := se.handleStmtExecute(values)
-		if err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateResultResponse(se.status, r)
-	case mysql.ComStmtClose: // no response
-		if err := se.handleStmtClose(data); err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateNoopResponse()
-	case mysql.ComStmtSendLongData: // no response
-		values := make([]byte, len(data))
-		copy(values, data)
-		if err := se.handleStmtSendLongData(values); err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateNoopResponse()
-	case mysql.ComStmtReset:
-		if err := se.handleStmtReset(data); err != nil {
-			return CreateErrorResponse(se.status, err)
-		}
-		return CreateOKResponse(se.status)
-	case mysql.ComSetOption:
-		return CreateEOFResponse(se.status)
-	default:
-		msg := fmt.Sprintf("command %d not supported now", cmd)
-		log.Warn("dispatch command failed, error: %s", msg)
-		return CreateErrorResponse(se.status, mysql.NewError(mysql.ErrUnknown, msg))
-	}
 }
 
 func (se *SessionExecutor) getBackendConns(sqls map[string]map[string][]string, fromSlave bool) (pcs map[string]backend.PooledConnect, err error) {
@@ -612,7 +456,7 @@ func createShowGeneralLogResult() *mysql.Result {
 	r := new(mysql.Resultset)
 
 	field := &mysql.Field{}
-	field.Name = hack.Slice(gaeaGeneralLogVariable)
+	field.Name = hack.Slice(generalLogVariable)
 	r.Fields = append(r.Fields, field)
 
 	var value string
