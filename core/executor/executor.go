@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	common "github.com/XiaoMi/Gaea/common/constant"
+	plan2 "github.com/XiaoMi/Gaea/core/plan"
 	"github.com/XiaoMi/Gaea/core/router"
 	"runtime"
 	"strconv"
@@ -32,7 +33,6 @@ import (
 	"github.com/XiaoMi/Gaea/parser"
 	"github.com/XiaoMi/Gaea/parser/ast"
 	"github.com/XiaoMi/Gaea/parser/format"
-	"github.com/XiaoMi/Gaea/proxy/plan"
 	"github.com/XiaoMi/Gaea/util"
 	"github.com/XiaoMi/Gaea/util/hack"
 )
@@ -437,7 +437,7 @@ func createShowDatabaseResult(dbs []string) *mysql.Result {
 		Resultset:    r,
 	}
 
-	plan.GenerateSelectResultRowData(result)
+	plan2.GenerateSelectResultRowData(result)
 	return result
 }
 
@@ -460,7 +460,7 @@ func createShowGeneralLogResult() *mysql.Result {
 		Resultset:    r,
 	}
 
-	plan.GenerateSelectResultRowData(result)
+	plan2.GenerateSelectResultRowData(result)
 	return result
 }
 
@@ -754,7 +754,7 @@ func (se *SessionExecutor) HandleUseDB(dbName string) error {
 	return mysql.NewDefaultError(mysql.ErrNoDB)
 }
 
-func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan.Plan, error) {
+func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan2.Plan, error) {
 	n, err := se.Parse(sql)
 	if err != nil {
 		return nil, fmt.Errorf("parse sql error, sql: %s, err: %v", sql, err)
@@ -763,7 +763,7 @@ func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan.P
 	rt := ns.GetRouter()
 	seq := ns.GetSequences()
 	phyDBs := ns.GetPhysicalDBs()
-	p, err := plan.BuildPlan(n, phyDBs, db, sql, rt, seq)
+	p, err := plan2.BuildPlan(n, phyDBs, db, sql, rt, seq)
 	if err != nil {
 		return nil, fmt.Errorf("create select plan error: %v", err)
 	}
