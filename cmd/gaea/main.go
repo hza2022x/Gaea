@@ -17,12 +17,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
-	"github.com/XiaoMi/Gaea/core"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/log/xlog"
 	"github.com/XiaoMi/Gaea/models"
@@ -35,11 +35,11 @@ var info = flag.Bool("info", false, "show info of gaea")
 func main() {
 	flag.Parse()
 	if *info {
-		fmt.Printf("Build Version Information:%s\n", core.Info.LongForm())
+		fmt.Printf("Build Version Information:%s\n", common.Info.LongForm())
 		return
 	}
 
-	fmt.Printf("Build Version Information:%s\n", core.Info.LongForm())
+	fmt.Printf("Build Version Information:%s\n", common.Info.LongForm())
 
 	// init config of gaea proxy
 	cfg, err := models.ParseProxyConfigFromFile(*configFile)

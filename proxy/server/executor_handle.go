@@ -18,12 +18,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/XiaoMi/Gaea/backend"
-	"github.com/XiaoMi/Gaea/core/errors"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser"
@@ -52,7 +52,7 @@ func (se *SessionExecutor) handleQuery(sql string) (r *mysql.Result, err error) 
 					sql, err.Error(), string(buf))
 			}
 
-			err = errors.ErrInternalServer
+			err = common.ErrInternalServer
 			return
 		}
 	}()

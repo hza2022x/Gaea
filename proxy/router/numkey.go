@@ -16,12 +16,11 @@ package router
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"math"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/XiaoMi/Gaea/core/errors"
 )
 
 const (
@@ -69,8 +68,8 @@ func ParseNumSharding(Locations []int, TableRowLimit int) ([]NumKeyRange, error)
 }
 
 // ParseDayRange return date of daynumber by order
-//20151201-20151205
-//20151201,20151202,20151203,20151204,20151205
+// 20151201-20151205
+// 20151201,20151202,20151203,20151204,20151205
 func ParseDayRange(dateRange string) ([]int, error) {
 	timeFormat := "20060102"
 	dateDays := make([]int, 0)
@@ -79,7 +78,7 @@ func ParseDayRange(dateRange string) ([]int, error) {
 	dateTmp := strings.SplitN(dateRange, "-", 2)
 	if len(dateTmp) == 1 {
 		if len(dateTmp[0]) != dateLength {
-			return nil, errors.ErrDateRangeIllegal
+			return nil, common.ErrDateRangeIllegal
 		}
 		dateNum, err := strconv.Atoi(dateTmp[0])
 		if err != nil {
@@ -88,10 +87,10 @@ func ParseDayRange(dateRange string) ([]int, error) {
 		return []int{dateNum}, nil
 	}
 	if len(dateTmp) != 2 {
-		return nil, errors.ErrDateRangeIllegal
+		return nil, common.ErrDateRangeIllegal
 	}
 	if len(dateTmp[0]) != dateLength || len(dateTmp[1]) != dateLength {
-		return nil, errors.ErrDateRangeIllegal
+		return nil, common.ErrDateRangeIllegal
 	}
 	//change the begin day and the end day
 	if dateTmp[1] < dateTmp[0] {
@@ -123,8 +122,8 @@ func ParseDayRange(dateRange string) ([]int, error) {
 }
 
 // ParseMonthRange return date of month by order
-//201510-201512
-//201510,201511,201512
+// 201510-201512
+// 201510,201511,201512
 func ParseMonthRange(dateRange string) ([]int, error) {
 	dateMonth := make([]int, 0)
 	dateLength := 6
@@ -132,7 +131,7 @@ func ParseMonthRange(dateRange string) ([]int, error) {
 	dateTmp := strings.SplitN(dateRange, "-", 2)
 	if len(dateTmp) == 1 {
 		if len(dateTmp[0]) != dateLength {
-			return nil, errors.ErrDateRangeIllegal
+			return nil, common.ErrDateRangeIllegal
 		}
 		dateNum, err := strconv.Atoi(dateTmp[0])
 		if err != nil {
@@ -141,10 +140,10 @@ func ParseMonthRange(dateRange string) ([]int, error) {
 		return []int{dateNum}, nil
 	}
 	if len(dateTmp) != 2 {
-		return nil, errors.ErrDateRangeIllegal
+		return nil, common.ErrDateRangeIllegal
 	}
 	if len(dateTmp[0]) != dateLength || len(dateTmp[1]) != dateLength {
-		return nil, errors.ErrDateRangeIllegal
+		return nil, common.ErrDateRangeIllegal
 	}
 	//change the begin month and the end month
 	if dateTmp[1] < dateTmp[0] {
@@ -186,8 +185,8 @@ func ParseMonthRange(dateRange string) ([]int, error) {
 }
 
 // ParseYearRange return date of year by order
-//2013-2015
-//2013,2014,2015
+// 2013-2015
+// 2013,2014,2015
 func ParseYearRange(dateRange string) ([]int, error) {
 	dateYear := make([]int, 0)
 	dateLength := 4
@@ -195,7 +194,7 @@ func ParseYearRange(dateRange string) ([]int, error) {
 	dateTmp := strings.SplitN(dateRange, "-", 2)
 	if len(dateTmp) == 1 {
 		if len(dateTmp[0]) != dateLength {
-			return nil, errors.ErrDateRangeIllegal
+			return nil, common.ErrDateRangeIllegal
 		}
 		dateNum, err := strconv.Atoi(dateTmp[0])
 		if err != nil {
@@ -204,7 +203,7 @@ func ParseYearRange(dateRange string) ([]int, error) {
 		return []int{dateNum}, nil
 	}
 	if len(dateTmp) != 2 {
-		return nil, errors.ErrDateRangeIllegal
+		return nil, common.ErrDateRangeIllegal
 	}
 	//change the begin year and the end year
 	if dateTmp[1] < dateTmp[0] {

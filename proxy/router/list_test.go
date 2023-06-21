@@ -29,9 +29,8 @@
 package router
 
 import (
+	"github.com/XiaoMi/Gaea/common"
 	"testing"
-
-	"github.com/XiaoMi/Gaea/core/errors"
 )
 
 func testCheckList(t *testing.T, l []int, checkList ...int) {
@@ -63,7 +62,7 @@ func TestParseYearRange(t *testing.T) {
 
 	dateRange = "20120"
 	years, err = ParseYearRange(dateRange)
-	if err != errors.ErrDateRangeIllegal || years != nil {
+	if err != common.ErrDateRangeIllegal || years != nil {
 		t.Fatal(err)
 	}
 
@@ -116,7 +115,7 @@ func TestParseMonthRange(t *testing.T) {
 
 	dateRange = "20120"
 	months, err = ParseMonthRange(dateRange)
-	if err != errors.ErrDateRangeIllegal || months != nil {
+	if err != common.ErrDateRangeIllegal || months != nil {
 		t.Fatal(err)
 	}
 
@@ -166,7 +165,7 @@ func TestParseDayRange(t *testing.T) {
 
 	dateRange = "2016034"
 	days, err = ParseDayRange(dateRange)
-	if err != errors.ErrDateRangeIllegal || days != nil {
+	if err != common.ErrDateRangeIllegal || days != nil {
 		t.Fatal(err)
 	}
 

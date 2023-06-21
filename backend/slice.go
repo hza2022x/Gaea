@@ -30,11 +30,11 @@ package backend
 
 import (
 	"context"
+	"github.com/XiaoMi/Gaea/common"
 	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/XiaoMi/Gaea/core/errors"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/mysql"
@@ -108,7 +108,7 @@ func (s *Slice) GetMasterConn() (PooledConnect, error) {
 // GetSlaveConn return a connection in slave pool
 func (s *Slice) GetSlaveConn() (PooledConnect, error) {
 	if len(s.Slave) == 0 {
-		return nil, errors.ErrNoDatabase
+		return nil, common.ErrNoDatabase
 	}
 
 	s.Lock()
@@ -124,7 +124,7 @@ func (s *Slice) GetSlaveConn() (PooledConnect, error) {
 // GetStatisticSlaveConn return a connection in statistic slave pool
 func (s *Slice) GetStatisticSlaveConn() (PooledConnect, error) {
 	if len(s.StatisticSlave) == 0 {
-		return nil, errors.ErrNoDatabase
+		return nil, common.ErrNoDatabase
 	}
 
 	s.Lock()
@@ -160,7 +160,7 @@ func (s *Slice) Close() error {
 // ParseMaster create master connection pool
 func (s *Slice) ParseMaster(masterStr string) error {
 	if len(masterStr) == 0 {
-		return errors.ErrNoMasterDB
+		return common.ErrNoMasterDB
 	}
 	idleTimeout, err := util.Int2TimeDuration(s.Cfg.IdleTimeout)
 	if err != nil {

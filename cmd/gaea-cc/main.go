@@ -17,14 +17,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
 	"github.com/XiaoMi/Gaea/cc"
-	"github.com/XiaoMi/Gaea/core"
-
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/log/xlog"
 	"github.com/XiaoMi/Gaea/models"
@@ -52,11 +51,11 @@ func initXLog(ccConfig *models.CCConfig) error {
 func main() {
 	flag.Parse()
 	if *info {
-		fmt.Printf("Build Version Information:%s\n", core.Info.LongForm())
+		fmt.Printf("Build Version Information:%s\n", common.Info.LongForm())
 		return
 	}
 
-	fmt.Printf("Build Version Information:%s\n", core.Info.LongForm())
+	fmt.Printf("Build Version Information:%s\n", common.Info.LongForm())
 
 	// 初始化配置
 	ccConfig, err := models.ParseCCConfig(*ccConfigFile)

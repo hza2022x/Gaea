@@ -16,7 +16,7 @@ package models
 
 import (
 	"fmt"
-	"github.com/XiaoMi/Gaea/core/errors"
+	"github.com/XiaoMi/Gaea/common"
 	"regexp"
 	"strconv"
 )
@@ -95,7 +95,7 @@ func (s *Shard) verify() error {
 func (s *Shard) verifyRuleSliceInfos() error {
 	f, ok := ruleVerifyFuncMapping[s.Type]
 	if !ok {
-		return errors.ErrUnknownRuleType
+		return common.ErrUnknownRuleType
 	}
 	return f(s)
 }

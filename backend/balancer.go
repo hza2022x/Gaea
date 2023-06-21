@@ -15,10 +15,9 @@
 package backend
 
 import (
+	"github.com/XiaoMi/Gaea/common"
 	"math/rand"
 	"time"
-
-	"github.com/XiaoMi/Gaea/core/errors"
 )
 
 type balancer struct {
@@ -94,7 +93,7 @@ func (b *balancer) next() (int, error) {
 	var index int
 	queueLen := len(b.roundRobinQ)
 	if queueLen == 0 {
-		return 0, errors.ErrNoDatabase
+		return 0, common.ErrNoDatabase
 	}
 	if queueLen == 1 {
 		index = b.roundRobinQ[0]
@@ -104,7 +103,7 @@ func (b *balancer) next() (int, error) {
 	b.lastIndex = b.lastIndex % queueLen
 	index = b.roundRobinQ[b.lastIndex]
 	if index >= b.total {
-		return 0, errors.ErrNoDatabase
+		return 0, common.ErrNoDatabase
 	}
 	b.lastIndex++
 	b.lastIndex = b.lastIndex % queueLen

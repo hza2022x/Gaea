@@ -16,8 +16,7 @@ package plan
 
 import (
 	"fmt"
-
-	"github.com/XiaoMi/Gaea/core/errors"
+	"github.com/XiaoMi/Gaea/common"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"
@@ -105,7 +104,7 @@ func precheckInsertStmt(p *InsertPlan) error {
 	stmt := p.stmt
 	// doesn't support insert into select...
 	if stmt.Select != nil {
-		return errors.ErrSelectInInsert
+		return common.ErrSelectInInsert
 	}
 
 	// INSERT INTO tbl SET col=val, ...
@@ -115,7 +114,7 @@ func precheckInsertStmt(p *InsertPlan) error {
 	}
 
 	if len(stmt.Columns) == 0 {
-		return errors.ErrIRNoColumns
+		return common.ErrIRNoColumns
 	}
 
 	values := stmt.Lists[0]
@@ -266,7 +265,7 @@ func handleInsertOnDuplicate(p *InsertPlan) error {
 	shardingColumnName := p.tableRules[p.table].GetShardingColumn()
 	for _, a := range p.stmt.OnDuplicate {
 		if a.Column.Name.L == shardingColumnName {
-			return errors.ErrUpdateKey
+			return common.ErrUpdateKey
 		}
 		removeSchemaAndTableInfoInColumnName(a.Column)
 	}

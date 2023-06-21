@@ -17,6 +17,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,7 +25,6 @@ import (
 	"time"
 
 	"github.com/XiaoMi/Gaea/backend"
-	"github.com/XiaoMi/Gaea/core/errors"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser"
@@ -201,7 +201,7 @@ func (se *SessionExecutor) setStringSessionVariable(name string, valueStr string
 func (se *SessionExecutor) setGeneralLogVariable(valueStr string) error {
 	v, err := strconv.Atoi(valueStr)
 	if err != nil {
-		return errors.ErrInvalidArgument
+		return common.ErrInvalidArgument
 	}
 	atomic.StoreUint32(&ProcessGeneralLog, uint32(v))
 	return nil
@@ -457,10 +457,10 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 
 	parallel := len(pcs)
 	if parallel != len(sqls) {
-		log.Warn("Session executeInMultiSlices error, conns: %v, sqls: %v, error: %s", pcs, sqls, errors.ErrConnNotEqual.Error())
-		return nil, errors.ErrConnNotEqual
+		log.Warn("Session executeInMultiSlices error, conns: %v, sqls: %v, error: %s", pcs, sqls, common.ErrConnNotEqual.Error())
+		return nil, common.ErrConnNotEqual
 	} else if parallel == 0 {
-		return nil, errors.ErrNoPlan
+		return nil, common.ErrNoPlan
 	}
 
 	var ctx = context.Background()
@@ -539,7 +539,7 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 			for j := 0; j < len(pcsUnCompleted); j++ {
 				<-done
 			}
-			return nil, fmt.Errorf("%v %dms", errors.ErrTimeLimitExceeded, maxExecuteTime)
+			return nil, fmt.Errorf("%v %dms", common.ErrTimeLimitExceeded, maxExecuteTime)
 		}
 	}
 

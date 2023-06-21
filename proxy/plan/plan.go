@@ -169,51 +169,51 @@ type TableAliasStmtInfo struct {
 }
 
 // BuildPlan build plan for ast
-func BuildPlan(stmt ast.StmtNode, phyDBs map[string]string, db, sql string, router *router.Router, seq *sequence.SequenceManager) (Plan, error) {
-	if IsSelectLastInsertIDStmt(stmt) {
+func BuildPlan(node ast.StmtNode, phyDBs map[string]string, db, sql string, router *router.Router, seq *sequence.SequenceManager) (Plan, error) {
+	if IsSelectLastInsertIDStmt(node) {
 		return CreateSelectLastInsertIDPlan(), nil
 	}
 
-	if estmt, ok := stmt.(*ast.ExplainStmt); ok {
-		return buildExplainPlan(estmt, phyDBs, db, sql, router, seq)
+	if stmt, ok := node.(*ast.ExplainStmt); ok {
+		return buildExplainPlan(stmt, phyDBs, db, sql, router, seq)
 	}
 
 	checker := NewChecker(db, router)
-	stmt.Accept(checker)
+	node.Accept(checker)
 
 	if checker.IsDatabaseInvalid() {
 		return nil, fmt.Errorf("no database selected") // TODO: return standard MySQL error
 	}
 
 	if checker.IsShard() {
-		return buildShardPlan(stmt, db, sql, router, seq)
+		return buildShardPlan(node, db, sql, router, seq)
 	}
-	return CreateUnshardPlan(stmt, phyDBs, db, checker.GetUnshardTableNames())
+	return CreateUnshardPlan(node, phyDBs, db, checker.GetUnshardTableNames())
 }
 
 func buildShardPlan(stmt ast.StmtNode, db string, sql string, router *router.Router, seq *sequence.SequenceManager) (Plan, error) {
-	switch s := stmt.(type) {
+	switch stmtType := stmt.(type) {
 	case *ast.SelectStmt:
 		plan := NewSelectPlan(db, sql, router)
-		if err := HandleSelectStmt(plan, s); err != nil {
+		if err := HandleSelectStmt(plan, stmtType); err != nil {
 			return nil, err
 		}
 		return plan, nil
 	case *ast.InsertStmt:
 		// InsertStmt contains REPLACE statement
 		plan := NewInsertPlan(db, sql, router, seq)
-		if err := HandleInsertStmt(plan, s); err != nil {
+		if err := HandleInsertStmt(plan, stmtType); err != nil {
 			return nil, err
 		}
 		return plan, nil
 	case *ast.UpdateStmt:
-		plan := NewUpdatePlan(s, db, sql, router)
+		plan := NewUpdatePlan(stmtType, db, sql, router)
 		if err := HandleUpdatePlan(plan); err != nil {
 			return nil, err
 		}
 		return plan, nil
 	case *ast.DeleteStmt:
-		plan := NewDeletePlan(s, db, sql, router)
+		plan := NewDeletePlan(stmtType, db, sql, router)
 		if err := HandleDeletePlan(plan); err != nil {
 			return nil, err
 		}

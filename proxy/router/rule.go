@@ -30,11 +30,11 @@ package router
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"github.com/XiaoMi/Gaea/core/errors"
 	"github.com/XiaoMi/Gaea/models"
 )
 
@@ -178,7 +178,7 @@ func (r *BaseRule) GetType() string {
 func (r *BaseRule) GetDatabaseNameByTableIndex(index int) (string, error) {
 	if IsMycatShardingRule(r.ruleType) || r.ruleType == GlobalTableRuleType {
 		if index > len(r.subTableIndexes) {
-			return "", errors.ErrInvalidArgument
+			return "", common.ErrInvalidArgument
 		}
 		return r.mycatDatabases[index], nil
 	}
@@ -459,7 +459,7 @@ func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, Shard, error) {
 		shard := NewGlobalTableShard()
 		return subTableIndexs, tableToSlice, shard, nil
 	default:
-		return nil, nil, nil, errors.ErrUnknownRuleType
+		return nil, nil, nil, common.ErrUnknownRuleType
 	}
 }
 
@@ -469,7 +469,7 @@ func parseHashRuleSliceInfos(locations []int, slices []string) ([]int, map[int]i
 	tableToSlice := make(map[int]int, 0)
 
 	if len(locations) != len(slices) {
-		return nil, nil, errors.ErrLocationsCount
+		return nil, nil, common.ErrLocationsCount
 	}
 	for i := 0; i < len(locations); i++ {
 		for j := 0; j < locations[i]; j++ {
@@ -493,7 +493,7 @@ func parseMycatHashRuleSliceInfos(locations []int, slices []string, databases []
 	}
 
 	if len(tableToSlice) != len(realDatabaseList) {
-		return nil, nil, errors.ErrLocationsCount
+		return nil, nil, common.ErrLocationsCount
 	}
 
 	return subTableIndexs, tableToSlice, nil
@@ -504,7 +504,7 @@ func parseDateDayRuleSliceInfos(dateRange []string, slices []string) ([]int, map
 	tableToSlice := make(map[int]int, 0)
 
 	if len(dateRange) != len(slices) {
-		return nil, nil, errors.ErrDateRangeCount
+		return nil, nil, common.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
 		dayNumbers, err := ParseDayRange(dateRange[i])
@@ -512,7 +512,7 @@ func parseDateDayRuleSliceInfos(dateRange []string, slices []string) ([]int, map
 			return nil, nil, err
 		}
 		if len(subTableIndexs) > 0 && dayNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return nil, nil, errors.ErrDateRangeOverlap
+			return nil, nil, common.ErrDateRangeOverlap
 		}
 		for _, v := range dayNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -527,7 +527,7 @@ func parseDateMonthRuleSliceInfos(dateRange []string, slices []string) ([]int, m
 	tableToSlice := make(map[int]int, 0)
 
 	if len(dateRange) != len(slices) {
-		return nil, nil, errors.ErrDateRangeCount
+		return nil, nil, common.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
 		monthNumbers, err := ParseMonthRange(dateRange[i])
@@ -535,7 +535,7 @@ func parseDateMonthRuleSliceInfos(dateRange []string, slices []string) ([]int, m
 			return nil, nil, err
 		}
 		if len(subTableIndexs) > 0 && monthNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return nil, nil, errors.ErrDateRangeOverlap
+			return nil, nil, common.ErrDateRangeOverlap
 		}
 		for _, v := range monthNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -550,7 +550,7 @@ func parseDateYearRuleSliceInfos(dateRange []string, slices []string) ([]int, ma
 	tableToSlice := make(map[int]int, 0)
 
 	if len(dateRange) != len(slices) {
-		return nil, nil, errors.ErrDateRangeCount
+		return nil, nil, common.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
 		yearNumbers, err := ParseYearRange(dateRange[i])
@@ -558,7 +558,7 @@ func parseDateYearRuleSliceInfos(dateRange []string, slices []string) ([]int, ma
 			return nil, nil, err
 		}
 		if len(subTableIndexs) > 0 && yearNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return nil, nil, errors.ErrDateRangeOverlap
+			return nil, nil, common.ErrDateRangeOverlap
 		}
 		for _, v := range yearNumbers {
 			tableToSlice[v] = i
@@ -580,7 +580,7 @@ func parseGlobalTableRuleSliceInfos(locations []int, slices []string, databases 
 			return nil, nil, err
 		}
 		if len(tableToSlice) != len(realDatabaseList) {
-			return nil, nil, errors.ErrLocationsCount
+			return nil, nil, common.ErrLocationsCount
 		}
 	}
 

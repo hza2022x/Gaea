@@ -19,10 +19,10 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	sqlerr "github.com/XiaoMi/Gaea/common"
 	"net"
 	"strings"
 
-	sqlerr "github.com/XiaoMi/Gaea/core/errors"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/util/sync2"

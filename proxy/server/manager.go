@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
+	"github.com/XiaoMi/Gaea/common"
 	"net/http"
 	"sort"
 	"strconv"
@@ -25,7 +26,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/XiaoMi/Gaea/core/errors"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/log/xlog"
 	"github.com/XiaoMi/Gaea/models"
@@ -208,7 +208,7 @@ func (m *Manager) ReloadNamespacePrepare(namespaceConfig *models.Namespace) erro
 // ReloadNamespaceCommit commit config
 func (m *Manager) ReloadNamespaceCommit(name string) error {
 	if !m.reloadPrepared.CompareAndSwap(true, false) {
-		err := errors.ErrNamespaceNotPrepared
+		err := common.ErrNamespaceNotPrepared
 		log.Warn("commit namespace error, namespace: %s, err: %v", name, err)
 		return err
 	}
@@ -873,19 +873,19 @@ func (s *StatisticManager) AddWriteFlowCount(namespace string, byteCount int) {
 	s.flowCounts.Add(statsKey, int64(byteCount))
 }
 
-//record idle connect count
+// record idle connect count
 func (s *StatisticManager) recordConnectPoolIdleCount(namespace string, slice string, addr string, count int64) {
 	statsKey := []string{s.clusterName, namespace, slice, addr}
 	s.backendConnectPoolIdleCounts.Set(statsKey, count)
 }
 
-//record in-use connect count
+// record in-use connect count
 func (s *StatisticManager) recordConnectPoolInuseCount(namespace string, slice string, addr string, count int64) {
 	statsKey := []string{s.clusterName, namespace, slice, addr}
 	s.backendConnectPoolInUseCounts.Set(statsKey, count)
 }
 
-//record wait queue length
+// record wait queue length
 func (s *StatisticManager) recordConnectPoolWaitCount(namespace string, slice string, addr string, count int64) {
 	statsKey := []string{s.clusterName, namespace, slice, addr}
 	s.backendConnectPoolWaitCounts.Set(statsKey, count)
