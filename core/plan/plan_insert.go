@@ -16,13 +16,13 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/backend/sequence"
 	common "github.com/XiaoMi/Gaea/common/constant"
 	router2 "github.com/XiaoMi/Gaea/core/router"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"
 	driver "github.com/XiaoMi/Gaea/parser/tidb-types/parser_driver"
-	"github.com/XiaoMi/Gaea/proxy/sequence"
 	"github.com/XiaoMi/Gaea/util"
 )
 

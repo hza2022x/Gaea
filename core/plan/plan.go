@@ -16,6 +16,7 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/backend/sequence"
 	router2 "github.com/XiaoMi/Gaea/core/router"
 	"strings"
 
@@ -23,7 +24,6 @@ import (
 	"github.com/XiaoMi/Gaea/parser"
 	"github.com/XiaoMi/Gaea/parser/ast"
 	"github.com/XiaoMi/Gaea/parser/format"
-	"github.com/XiaoMi/Gaea/proxy/sequence"
 	"github.com/XiaoMi/Gaea/util"
 	"github.com/XiaoMi/Gaea/util/hack"
 )
