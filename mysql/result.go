@@ -32,7 +32,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"strconv"
 
 	"github.com/XiaoMi/Gaea/util/hack"
@@ -498,7 +498,7 @@ func BuildResultset(fields []*Field, names []string, values [][]interface{}) (*R
 		if len(r.Fields) == len(fields) {
 			ExistFields = true
 		} else {
-			return nil, common.ErrInvalidArgument
+			return nil, constant.ErrInvalidArgument
 		}
 	}
 

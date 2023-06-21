@@ -19,7 +19,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	sqlerr "github.com/XiaoMi/Gaea/common"
+	sqlerr "github.com/XiaoMi/Gaea/common/constant"
 	"net"
 	"strings"
 

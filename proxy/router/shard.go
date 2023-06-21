@@ -36,7 +36,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	common "github.com/XiaoMi/Gaea/common/constant"
 	"hash/crc32"
 	"strconv"
 	"time"

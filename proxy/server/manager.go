@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	common "github.com/XiaoMi/Gaea/common/constant"
 	"net/http"
 	"sort"
 	"strconv"

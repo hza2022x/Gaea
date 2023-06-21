@@ -16,7 +16,7 @@ package models
 
 import (
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	common "github.com/XiaoMi/Gaea/common/constant"
 	"strconv"
 	"strings"
 )

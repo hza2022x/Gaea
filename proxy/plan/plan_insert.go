@@ -16,7 +16,7 @@ package plan
 
 import (
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	common "github.com/XiaoMi/Gaea/common/constant"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"

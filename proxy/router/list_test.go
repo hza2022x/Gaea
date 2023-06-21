@@ -29,7 +29,6 @@
 package router
 
 import (
-	"github.com/XiaoMi/Gaea/common"
 	"testing"
 )
 

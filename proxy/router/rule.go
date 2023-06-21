@@ -30,7 +30,7 @@ package router
 
 import (
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	common "github.com/XiaoMi/Gaea/common/constant"
 	"regexp"
 	"strconv"
 	"strings"

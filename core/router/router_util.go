@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/XiaoMi/Gaea/common"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"github.com/XiaoMi/Gaea/parser"
 	"strings"
 )
@@ -23,6 +23,6 @@ func CanExecuteFromSlave(sql string) bool {
 
 	_, comments := parser.SplitMarginComments(sql)
 	hint := strings.ToLower(strings.TrimSpace(comments.Leading))
-	result := strings.ToLower(hint) == common.MasterHint
+	result := strings.ToLower(hint) == constant.MasterHint
 	return !result
 }

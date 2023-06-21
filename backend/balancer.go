@@ -15,7 +15,7 @@
 package backend
 
 import (
-	"github.com/XiaoMi/Gaea/common"
+	common "github.com/XiaoMi/Gaea/common/constant"
 	"math/rand"
 	"time"
 )

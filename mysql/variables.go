@@ -16,7 +16,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/XiaoMi/Gaea/common"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"strconv"
 	"strings"
 )
@@ -214,7 +214,7 @@ func verifySQLMode(v interface{}) error {
 	values := strings.Split(value, ",")
 	for _, sqlMode := range values {
 		if _, ok := SQLModeSet[sqlMode]; !ok {
-			return common.ErrInvalidSQLMode
+			return constant.ErrInvalidSQLMode
 		}
 	}
 	return nil
