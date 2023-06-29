@@ -16,6 +16,7 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/merger"
 	"strconv"
 	"strings"
 
@@ -25,96 +26,18 @@ import (
 	"github.com/XiaoMi/Gaea/util/math"
 )
 
-// ResultRow is one Row in Result
-type ResultRow []interface{}
-
-// GetInt get int value from column
-// copy from Resultset.GetInt()
-func (r ResultRow) GetInt(column int) (int64, error) {
-	d := r[column]
-	switch v := d.(type) {
-	case uint64:
-		return int64(v), nil
-	case int64:
-		return v, nil
-	case float64:
-		return int64(v), nil
-	case string:
-		return strconv.ParseInt(v, 10, 64)
-	case []byte:
-		return strconv.ParseInt(string(v), 10, 64)
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("data type is %T", v)
-	}
-}
-
-// GetUint get uint64 value from column
-func (r ResultRow) GetUint(column int) (uint64, error) {
-	d := r[column]
-	switch v := d.(type) {
-	case uint64:
-		return v, nil
-	case int64:
-		return uint64(v), nil
-	case float64:
-		return uint64(v), nil
-	case string:
-		return strconv.ParseUint(v, 10, 64)
-	case []byte:
-		return strconv.ParseUint(string(v), 10, 64)
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("data type is %T", v)
-	}
-}
-
-// GetFloat get float64 value from column
-func (r ResultRow) GetFloat(column int) (float64, error) {
-	d := r[column]
-	switch v := d.(type) {
-	case float64:
-		return v, nil
-	case uint64:
-		return float64(v), nil
-	case int64:
-		return float64(v), nil
-	case string:
-		return strconv.ParseFloat(v, 64)
-	case []byte:
-		return strconv.ParseFloat(string(v), 64)
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("data type is %T", v)
-	}
-}
-
-// SetValue set value to column
-func (r ResultRow) SetValue(column int, value interface{}) {
-	r[column] = value
-}
-
-// GetValue get value from column
-func (r ResultRow) GetValue(column int) interface{} {
-	return r[column]
-}
-
-// AggregateFuncMerger is the merger of aggregate function
-type AggregateFuncMerger interface {
-	// MergeTo 合并结果集, from为待合并行, to为结果聚合行
-	MergeTo(from, to ResultRow) error
-}
-
 type aggregateFuncBaseMerger struct {
 	fieldIndex int // 所在列位置
 }
 
+// AggregateFuncCountMerger merge COUNT() column in result
+type AggregateFuncCountMerger struct {
+	aggregateFuncBaseMerger
+}
+
 // CreateAggregateFunctionMerger create AggregateFunctionMerger by function type
 // currently support: "count", "sum", "max", "min"
-func CreateAggregateFunctionMerger(funcType string, fieldIndex int) (AggregateFuncMerger, error) {
+func CreateAggregateFunctionMerger(funcType string, fieldIndex int) (merger.AggregateFuncMerger, error) {
 	switch strings.ToLower(funcType) {
 	case "count":
 		ret := new(AggregateFuncCountMerger)
@@ -137,13 +60,8 @@ func CreateAggregateFunctionMerger(funcType string, fieldIndex int) (AggregateFu
 	}
 }
 
-// AggregateFuncCountMerger merge COUNT() column in result
-type AggregateFuncCountMerger struct {
-	aggregateFuncBaseMerger
-}
-
 // MergeTo implement AggregateFuncMerger
-func (a *AggregateFuncCountMerger) MergeTo(from, to ResultRow) error {
+func (a *AggregateFuncCountMerger) MergeTo(from, to merger.ResultRow) error {
 	idx := a.fieldIndex
 	if idx >= len(from) || idx >= len(to) {
 		return fmt.Errorf("field index out of bound: %d", a.fieldIndex)
@@ -167,7 +85,7 @@ type AggregateFuncSumMerger struct {
 }
 
 // MergeTo implement AggregateFuncMerger
-func (a *AggregateFuncSumMerger) MergeTo(from, to ResultRow) error {
+func (a *AggregateFuncSumMerger) MergeTo(from, to merger.ResultRow) error {
 	idx := a.fieldIndex
 	if idx >= len(from) || idx >= len(to) {
 		return fmt.Errorf("field index out of bound: %d", a.fieldIndex)
@@ -194,7 +112,7 @@ func (a *AggregateFuncSumMerger) MergeTo(from, to ResultRow) error {
 	}
 }
 
-func (a *AggregateFuncSumMerger) sumToInt64(from, to ResultRow) error {
+func (a *AggregateFuncSumMerger) sumToInt64(from, to merger.ResultRow) error {
 	idx := a.fieldIndex // does not need to check
 	valueToMerge, err := from.GetInt(idx)
 	if err != nil {
@@ -208,7 +126,7 @@ func (a *AggregateFuncSumMerger) sumToInt64(from, to ResultRow) error {
 	return nil
 }
 
-func (a *AggregateFuncSumMerger) sumToUint64(from, to ResultRow) error {
+func (a *AggregateFuncSumMerger) sumToUint64(from, to merger.ResultRow) error {
 	idx := a.fieldIndex // does not need to check
 	valueToMerge, err := from.GetUint(idx)
 	if err != nil {
@@ -222,7 +140,7 @@ func (a *AggregateFuncSumMerger) sumToUint64(from, to ResultRow) error {
 	return nil
 }
 
-func (a *AggregateFuncSumMerger) sumToFloat64(from, to ResultRow) error {
+func (a *AggregateFuncSumMerger) sumToFloat64(from, to merger.ResultRow) error {
 	idx := a.fieldIndex // does not need to check
 	valueToMerge, err := from.GetFloat(idx)
 	if err != nil {
@@ -242,7 +160,7 @@ type AggregateFuncMaxMerger struct {
 }
 
 // MergeTo implement AggregateFuncMerger
-func (a *AggregateFuncMaxMerger) MergeTo(from, to ResultRow) error {
+func (a *AggregateFuncMaxMerger) MergeTo(from, to merger.ResultRow) error {
 	idx := a.fieldIndex
 	if idx >= len(from) || idx >= len(to) {
 		return fmt.Errorf("field index out of bound: %d", a.fieldIndex)
@@ -292,7 +210,7 @@ type AggregateFuncMinMerger struct {
 }
 
 // MergeTo implement AggregateFuncMerger
-func (a *AggregateFuncMinMerger) MergeTo(from, to ResultRow) error {
+func (a *AggregateFuncMinMerger) MergeTo(from, to merger.ResultRow) error {
 	idx := a.fieldIndex
 	if idx >= len(from) || idx >= len(to) {
 		return fmt.Errorf("field index out of bound: %d", a.fieldIndex)
@@ -462,7 +380,7 @@ func removeDistinctRowInResult(p *SelectPlan, r *mysql.Result) error {
 
 // contains mergeGroupByWithoutFunc() and mergeGroupByWithFunc()
 func buildSelectGroupByResult(p *SelectPlan, r *mysql.Result) error {
-	resultMap := make(map[string]ResultRow)
+	resultMap := make(map[string]merger.ResultRow)
 
 	resultFieldLength := len(r.Fields)
 	originColumnCount := p.GetColumnCount()
@@ -482,7 +400,7 @@ func buildSelectGroupByResult(p *SelectPlan, r *mysql.Result) error {
 		// 用找到的第一个结果行作为聚合结果
 		_, ok := resultMap[mk]
 		if !ok {
-			resultMap[mk] = ResultRow(r.Values[i])
+			resultMap[mk] = merger.ResultRow(r.Values[i])
 			continue
 		}
 
@@ -491,7 +409,7 @@ func buildSelectGroupByResult(p *SelectPlan, r *mysql.Result) error {
 		}
 
 		// 如果存在聚合函数, 则对聚合列进行结果聚合, 非聚合列不处理
-		retToMerge := ResultRow(r.Values[i])
+		retToMerge := merger.ResultRow(r.Values[i])
 		for _, mfunc := range p.aggregateFuncs {
 			if err := mfunc.MergeTo(retToMerge, resultMap[mk]); err != nil {
 				return fmt.Errorf("MergeTo error, func: %v, value: %v, err: %v", mfunc, retToMerge, err)
@@ -516,15 +434,15 @@ func buildSelectOnlyResult(p *SelectPlan, rs *mysql.Result) error {
 
 	// 存在聚合函数, 需要改写聚合列的值, 然后返回 (应该只有一行记录)
 	isSet := false
-	var currRet ResultRow
+	var currRet merger.ResultRow
 	for i, v := range r.Values {
 		if !isSet {
 			isSet = true
-			currRet = ResultRow(v)
+			currRet = merger.ResultRow(v)
 			continue
 		}
 
-		retToMerge := ResultRow(r.Values[i])
+		retToMerge := merger.ResultRow(r.Values[i])
 		for _, mfunc := range p.aggregateFuncs {
 			if err := mfunc.MergeTo(retToMerge, currRet); err != nil {
 				return fmt.Errorf("MergeTo error, func: %v, value: %v, err: %v", mfunc, retToMerge, err)
@@ -540,7 +458,7 @@ func buildSelectOnlyResult(p *SelectPlan, rs *mysql.Result) error {
 }
 
 // this function modifies the first value of origin results
-func buildResultFromResultMap(r *mysql.Result, resultMap map[string]ResultRow) error {
+func buildResultFromResultMap(r *mysql.Result, resultMap map[string]merger.ResultRow) error {
 	// no group by result means the result row count is 0, so return the first result
 	if len(resultMap) == 0 {
 		return nil

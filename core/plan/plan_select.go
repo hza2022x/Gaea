@@ -17,6 +17,7 @@ package plan
 import (
 	"fmt"
 	"github.com/XiaoMi/Gaea/core/algorithm"
+	"github.com/XiaoMi/Gaea/core/merger"
 	"github.com/XiaoMi/Gaea/core/router"
 
 	"github.com/XiaoMi/Gaea/mysql"
@@ -40,7 +41,7 @@ type SelectPlan struct {
 	originColumnCount int    // 补列前的列长度
 	columnCount       int    // 补列后的列长度
 
-	aggregateFuncs map[int]AggregateFuncMerger // key = column index
+	aggregateFuncs map[int]merger.AggregateFuncMerger // key = column index
 
 	offset int64 // LIMIT offset
 	count  int64 // LIMIT count, 未设置则为-1
@@ -53,7 +54,7 @@ type SelectPlan struct {
 func NewSelectPlan(db string, sql string, r *router.Router) *SelectPlan {
 	return &SelectPlan{
 		TableAliasStmtInfo: NewTableAliasStmtInfo(db, sql, r),
-		aggregateFuncs:     make(map[int]AggregateFuncMerger),
+		aggregateFuncs:     make(map[int]merger.AggregateFuncMerger),
 		offset:             -1,
 		count:              -1,
 	}
@@ -95,7 +96,7 @@ func (s *SelectPlan) GetStmt() *ast.SelectStmt {
 	return s.stmt
 }
 
-func (s *SelectPlan) setAggregateFuncMerger(idx int, merger AggregateFuncMerger) error {
+func (s *SelectPlan) setAggregateFuncMerger(idx int, merger merger.AggregateFuncMerger) error {
 	if _, ok := s.aggregateFuncs[idx]; ok {
 		return fmt.Errorf("column %d already set", idx)
 	}

@@ -16,6 +16,7 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/core/merger"
 	"testing"
 
 	"github.com/XiaoMi/Gaea/mysql"
@@ -53,7 +54,7 @@ func TestLimitSelectResult(t *testing.T) {
 				},
 			}
 
-			if err := limitSelectResult(info, ret); err != nil {
+			if err := merger.limitSelectResult(info, ret); err != nil {
 				t.Fatalf("limitSelectResult error: %v", err)
 			}
 
