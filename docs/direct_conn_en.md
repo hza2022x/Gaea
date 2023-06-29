@@ -8,7 +8,7 @@
 
 There are some details about the initial handshake packet in [the official document](https://mariadb.com/kb/en/connection/) , and please see the details below.
 
-<img src="./assets/image-20220315221559157.png" alt="image-20220315221559157" style="zoom:100%;" /> 
+<img src="../backend/assets/image-20220315221559157.png" alt="image-20220315221559157" style="zoom:100%;" /> 
 
 The actual packet demonstrates how this handshake works, and please see details below.
 
@@ -174,7 +174,7 @@ $ printf "%X" $(( ((0x6345513964)) ^ ((0xa54be1c71a)) ))
 
 The correct result, auth, is the same as Gaea's.
 
-<img src="./assets/image-20220318183833245.png" alt="image-20220318183833245" style="zoom:70%;" /> 
+<img src="../backend/assets/image-20220318183833245.png" alt="image-20220318183833245" style="zoom:70%;" /> 
 
 ### The third step
 
@@ -182,7 +182,7 @@ The correct result, auth, is the same as Gaea's.
 
 There are some details about the response packet in [the official document](https://mariadb.com/kb/en/connection/) , and please see the details below.
 
-<img src="./assets/image-20220318083633693.png" alt="image-20220318083633693" style="zoom:100%;" /> 
+<img src="../backend/assets/image-20220318083633693.png" alt="image-20220318083633693" style="zoom:100%;" /> 
 
 The actual packet demonstrates how this response works, and please see details below.
 
@@ -208,7 +208,7 @@ SpeedCrunch calculator takes both Gaea's capability and the capability to make a
 Gaea's capability & dc.capability = []uint32{41477} & []uint32{2181036030} = []uint32{41476}
 ```
 
-<img src="./assets/image-20220319002738908.png" alt="image-20220319002738908" style="zoom:70%;" /> 
+<img src="../backend/assets/image-20220319002738908.png" alt="image-20220319002738908" style="zoom:70%;" /> 
 
 | packet                            | exmaple                                                      |
 | --------------------------------- | ------------------------------------------------------------ |
@@ -311,19 +311,19 @@ However, the IDE tool produces the result in decimal.
 
 Linux Bash generates the sha1shum.
 
-<img src="./assets/image-20220314214316673.png" alt="image-20220314214316673" style="zoom:80%;" /> 
+<img src="../backend/assets/image-20220314214316673.png" alt="image-20220314214316673" style="zoom:80%;" /> 
 
 ### Website
 
 The tool on [the website](https://coding.tools/tw/sha1) calculates the sha1shum.
 
-<img src="./assets/image-20220314215924425.png" alt="image-20220314215924425" style="zoom:80%;" /> 
+<img src="../backend/assets/image-20220314215924425.png" alt="image-20220314215924425" style="zoom:80%;" /> 
 
 ### Broken Point
 
 The IDE uses broken point to take a look at the stage1 variable.
 
-<img src="./assets/image-20220314220921338.png" alt="image-20220314220921338" style="zoom:100%;" /> 
+<img src="../backend/assets/image-20220314220921338.png" alt="image-20220314220921338" style="zoom:100%;" /> 
 
 ### Comparison
 

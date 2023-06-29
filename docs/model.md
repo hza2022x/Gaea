@@ -14,4 +14,4 @@ Model 目录包含以下功能
 
 以下为相关文档
 
-- [指定设定值的读写方式 (file etcd etcdv3)](./connection.md)
+- [指定设定值的读写方式 (file etcd etcdv3)](../models/connection.md)

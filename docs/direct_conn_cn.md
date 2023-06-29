@@ -6,7 +6,7 @@
 
 参考 [官方文档](https://mariadb.com/kb/en/connection/) ，有以下内容
 
-<img src="./assets/image-20220315221559157.png" alt="image-20220315221559157" style="zoom:100%;" /> 
+<img src="../backend/assets/image-20220315221559157.png" alt="image-20220315221559157" style="zoom:100%;" /> 
 
 根据官方文档，使用范例说明
 
@@ -170,13 +170,13 @@ $ printf "%X" $(( ((0x6345513964)) ^ ((0xa54be1c71a)) ))
 
 下图为代码执行的结果，结果和用 Bash 推算的相同
 
-<img src="./assets/image-20220318183833245.png" alt="image-20220318183833245" style="zoom:70%;" /> 
+<img src="../backend/assets/image-20220318183833245.png" alt="image-20220318183833245" style="zoom:70%;" /> 
 
 ### 第三步 回应交握，传送讯息方向为 Gaea 至 MariaDB
 
 参考 [官方文档](https://mariadb.com/kb/en/connection/) ，有以下内容
 
-<img src="./assets/image-20220318083633693.png" alt="image-20220318083633693" style="zoom:100%;" /> 
+<img src="../backend/assets/image-20220318083633693.png" alt="image-20220318083633693" style="zoom:100%;" /> 
 
 根据官方文档，使用范例说明，先对 Gaea 要处理的功能标志 capability 进行计算，
 
@@ -200,7 +200,7 @@ $ printf "%X" $(( ((0x6345513964)) ^ ((0xa54be1c71a)) ))
 Gaea支持的capability & dc.capability = []uint32{41477} & []uint32{2181036030} = []uint32{41476}
 ```
 
-<img src="./assets/image-20220319002738908.png" alt="image-20220319002738908" style="zoom:70%;" /> 
+<img src="../backend/assets/image-20220319002738908.png" alt="image-20220319002738908" style="zoom:70%;" /> 
 
 | 内容                              | 演示范例                                                     |
 | --------------------------------- | ------------------------------------------------------------ |
@@ -301,17 +301,17 @@ $ echo -n xiaomi | od -td1
 
 使用 Linux 命令 去产生 stage1 的 sha1sum 验证码
 
-<img src="./assets/image-20220314214316673.png" alt="image-20220314214316673" style="zoom:80%;" /> 
+<img src="../backend/assets/image-20220314214316673.png" alt="image-20220314214316673" style="zoom:80%;" /> 
 
 使用 [网站](https://coding.tools/tw/sha1) 去计算 stage1 的 sha1sum 验证码
 
-<img src="./assets/image-20220314215924425.png" alt="image-20220314215924425" style="zoom:80%;" /> 
+<img src="../backend/assets/image-20220314215924425.png" alt="image-20220314215924425" style="zoom:80%;" /> 
 
 ### 使用中断点去观察 stage1 变量
 
 使用中断点去取出相对应 stage1 的 sha1sum 验证码
 
-<img src="./assets/image-20220314220921338.png" alt="image-20220314220921338" style="zoom:100%;" /> 
+<img src="../backend/assets/image-20220314220921338.png" alt="image-20220314220921338" style="zoom:100%;" /> 
 
 ### 确认 Sha1sum 验证码的数值
 

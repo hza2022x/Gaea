@@ -64,7 +64,7 @@ $ snap install etcd-manager
 
 只要填入正确的 IP 和 Address，就可以按下连线测试
 
-<img src="./assets/image-20220113164918661.png" alt="image-20220113164918661" style="zoom:80%;" />
+<img src="../models/etcdv3/assets/image-20220113164918661.png" alt="image-20220113164918661" style="zoom:80%;" />
 
 ## 3 Etcd 的连线测试
 
@@ -76,7 +76,7 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 -> 目前找不到可实验的 Etcd 服务器 (红色字体显示)
 
-<img src="./assets/image-20220113163203011.png" alt="image-20220113163203011" style="zoom:80%;" /> 
+<img src="../models/etcdv3/assets/image-20220113163203011.png" alt="image-20220113163203011" style="zoom:80%;" /> 
 
 ## 4 Etcd 的写入和租约测试
 
@@ -84,7 +84,7 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 以下为 测式函数 Test_EtcdV3 的代码内容
 
-<img src="./assets/image-20220117035130712.png" alt="image-20220117035130712" style="zoom:80%;" />
+<img src="../models/etcdv3/assets/image-20220117035130712.png" alt="image-20220117035130712" style="zoom:80%;" />
 
 以下的表会整理所有的测试过程
 
@@ -101,13 +101,13 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 - 使用 Update 函数，先只新增 key1 和 key2
 
-<img src="./assets/image-20220117040619272.png" alt="image-20220117040619272" style="zoom: 50%;" />  
+<img src="../models/etcdv3/assets/image-20220117040619272.png" alt="image-20220117040619272" style="zoom: 50%;" />  
 
 ### 测试项目2 删除测试
 
 - 使用 Delete 函数，删除 key1 只留 key2
 
-<img src="./assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
 
 ### 测试项目3 到时删除测试
 
@@ -115,11 +115,11 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 (5 秒之前，key2 和 key3 是存在的)
 
-<img src="./assets/image-20220117041532732.png" alt="image-20220117041532732" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117041532732.png" alt="image-20220117041532732" style="zoom:50%;" /> 
 
 (5 秒之后，key3 会被自动删除，只留 key2)
 
-<img src="./assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
 
 ### 测试项目4 追踪测试
 
@@ -132,11 +132,11 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 (1 秒之前，key2 和 key5 是存在的)
 
-<img src="./assets/image-20220117143235293.png" alt="image-20220117143235293" style="zoom:50%;" />  
+<img src="../models/etcdv3/assets/image-20220117143235293.png" alt="image-20220117143235293" style="zoom:50%;" />  
 
 (1 秒之后，key5 会被自动删除，只留 key2)
 
-<img src="./assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
 
 ### 测试项目5 租约测试
 
@@ -149,11 +149,11 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 (5 秒之前，key2、key6 和 key7 是存在的)
 
-<img src="./assets/image-20220117042408542.png" alt="image-20220117042408542" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117042408542.png" alt="image-20220117042408542" style="zoom:50%;" /> 
 
 (5 秒之后，key6 和 key7 会被自动删除，只留 key2)
 
-<img src="./assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117040820166.png" alt="image-20220117040820166" style="zoom:50%;" /> 
 
 ### 测试项目6 复原测试环境
 
@@ -161,7 +161,7 @@ Etcd V3 只要接通后，就会一直保持连线，所以不用另外在写 Pi
 
 (清除所有 key 值，所有的资料在 etcd 会不存在)
 
-<img src="./assets/image-20220117043339429.png" alt="image-20220117043339429" style="zoom:50%;" /> 
+<img src="../models/etcdv3/assets/image-20220117043339429.png" alt="image-20220117043339429" style="zoom:50%;" /> 
 
 ## 5 Etcd V2 和 V3 API 的差异
 
@@ -202,7 +202,7 @@ V2 版 API 和 V3 版 API 的功能差异整理成下表
 - 更新函数 Update 也要等待解锁后，才能进行更新操作
 - 监测函数 Watch 和 更新函数 Update互相等待，造成死结
 
-<img src="./assets/image-20220117112954091.png" alt="image-20220117112954091" style="zoom:80%;" /> 
+<img src="../models/etcdv3/assets/image-20220117112954091.png" alt="image-20220117112954091" style="zoom:80%;" /> 
 
 会建议改成以下版本，去避免死结问题发生
 
