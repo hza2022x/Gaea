@@ -17,7 +17,7 @@ package plan
 import (
 	"fmt"
 	"github.com/XiaoMi/Gaea/backend/sequence"
-	router2 "github.com/XiaoMi/Gaea/core/router"
+	"github.com/XiaoMi/Gaea/core/router"
 	"strings"
 
 	"github.com/XiaoMi/Gaea/mysql"
@@ -38,14 +38,14 @@ var _ Plan = &SelectLastInsertIDPlan{}
 // Checker 用于检查SelectStmt是不是分表的Visitor, 以及是否包含DB信息
 type Checker struct {
 	db            string
-	router        *router2.Router
+	router        *router.Router
 	hasShardTable bool // 是否包含分片表
 	dbInvalid     bool // SQL是否No database selected
 	tableNames    []*ast.TableName
 }
 
 // NewChecker db为USE db中设置的DB名. 如果没有执行USE db, 则为空字符串
-func NewChecker(db string, router *router2.Router) *Checker {
+func NewChecker(db string, router *router.Router) *Checker {
 	return &Checker{
 		db:            db,
 		router:        router,
@@ -130,9 +130,9 @@ func (*basePlan) Size() int {
 type StmtInfo struct {
 	db               string // session db
 	sql              string // origin sql
-	router           *router2.Router
-	tableRules       map[string]router2.Rule // key = table name, value = router.Rule, 记录使用到的分片表
-	globalTableRules map[string]router2.Rule // 记录使用到的全局表
+	router           *router.Router
+	tableRules       map[string]router.Rule // key = table name, value = router.Rule, 记录使用到的分片表
+	globalTableRules map[string]router.Rule // 记录使用到的全局表
 	result           *RouteResult
 }
 
@@ -145,7 +145,7 @@ type TableAliasStmtInfo struct {
 }
 
 // BuildPlan build plan for ast
-func BuildPlan(node ast.StmtNode, phyDBs map[string]string, db, sql string, router *router2.Router, seq *sequence.SequenceManager) (Plan, error) {
+func BuildPlan(node ast.StmtNode, phyDBs map[string]string, db, sql string, router *router.Router, seq *sequence.SequenceManager) (Plan, error) {
 	if IsSelectLastInsertIDStmt(node) {
 		return CreateSelectLastInsertIDPlan(), nil
 	}
@@ -167,7 +167,7 @@ func BuildPlan(node ast.StmtNode, phyDBs map[string]string, db, sql string, rout
 	return CreateUnshardPlan(node, phyDBs, db, checker.GetUnshardTableNames())
 }
 
-func buildShardPlan(stmt ast.StmtNode, db string, sql string, router *router2.Router, seq *sequence.SequenceManager) (Plan, error) {
+func buildShardPlan(stmt ast.StmtNode, db string, sql string, router *router.Router, seq *sequence.SequenceManager) (Plan, error) {
 	switch stmtType := stmt.(type) {
 	case *ast.SelectStmt:
 		plan := NewSelectPlan(db, sql, router)
@@ -200,19 +200,19 @@ func buildShardPlan(stmt ast.StmtNode, db string, sql string, router *router2.Ro
 }
 
 // NewStmtInfo constructor of StmtInfo
-func NewStmtInfo(db string, sql string, r *router2.Router) *StmtInfo {
+func NewStmtInfo(db string, sql string, r *router.Router) *StmtInfo {
 	return &StmtInfo{
 		db:               db,
 		sql:              sql,
 		router:           r,
-		tableRules:       make(map[string]router2.Rule),
-		globalTableRules: make(map[string]router2.Rule),
+		tableRules:       make(map[string]router.Rule),
+		globalTableRules: make(map[string]router.Rule),
 		result:           NewRouteResult("", "", nil), // nil route result
 	}
 }
 
 // NewTableAliasStmtInfo means table alias StmtInfo
-func NewTableAliasStmtInfo(db string, sql string, r *router2.Router) *TableAliasStmtInfo {
+func NewTableAliasStmtInfo(db string, sql string, r *router.Router) *TableAliasStmtInfo {
 	return &TableAliasStmtInfo{
 		StmtInfo:   NewStmtInfo(db, sql, r),
 		tableAlias: make(map[string]string),
@@ -232,7 +232,7 @@ func (s *StmtInfo) checkAndGetDB(db string) (string, error) {
 }
 
 // RecordShardTable 将表信息记录到StmtInfo中, 并返回表信息对应的路由规则
-func (s *StmtInfo) RecordShardTable(db, table string) (router2.Rule, error) {
+func (s *StmtInfo) RecordShardTable(db, table string) (router.Rule, error) {
 	rule, err := s.getShardRule(db, table)
 	if err != nil {
 		return nil, fmt.Errorf("get shard rule error, db: %s, table: %s, err: %v", db, table, err)
@@ -247,7 +247,7 @@ func (s *StmtInfo) RecordShardTable(db, table string) (router2.Rule, error) {
 
 // 根据db和table获取Rule
 // 如果只传table, 则使用session db.
-func (s *StmtInfo) getShardRule(db, table string) (router2.Rule, error) {
+func (s *StmtInfo) getShardRule(db, table string) (router.Rule, error) {
 	validDB, err := s.checkAndGetDB(db)
 	if err != nil {
 		return nil, err
@@ -258,7 +258,7 @@ func (s *StmtInfo) getShardRule(db, table string) (router2.Rule, error) {
 		return nil, fmt.Errorf("rule not found")
 	}
 
-	if rule.GetType() == router2.GlobalTableRuleType {
+	if rule.GetType() == router.GlobalTableRuleType {
 		s.globalTableRules[table] = rule
 	} else {
 		s.tableRules[table] = rule // 记录已经使用到的rule
@@ -268,15 +268,15 @@ func (s *StmtInfo) getShardRule(db, table string) (router2.Rule, error) {
 
 // 检查路由规则与现有RouteResult是否一致
 // 一致的标准: 与RouteResult的db, table一致
-func (s *StmtInfo) checkStmtRouteResult(rule router2.Rule) error {
+func (s *StmtInfo) checkStmtRouteResult(rule router.Rule) error {
 	// 如果是全局表, 不需要检查路由规则是否一致, 只记录该规则, 直接返回即可
-	if rule.GetType() == router2.GlobalTableRuleType {
+	if rule.GetType() == router.GlobalTableRuleType {
 		return nil
 	}
 
 	db := rule.GetDB()
 	var table string
-	if linkedRule, ok := rule.(*router2.LinkedRule); ok {
+	if linkedRule, ok := rule.(*router.LinkedRule); ok {
 		table = linkedRule.GetParentTable()
 	} else {
 		table = rule.GetTable()
@@ -296,9 +296,9 @@ func (s *StmtInfo) checkStmtRouteResult(rule router2.Rule) error {
 }
 
 // 用于WHERE条件或JOIN ON条件中, 只存在列名时, 查找对应的路由规则
-func (s *StmtInfo) getSettedRuleByColumnName(column string) (router2.Rule, bool, error) {
+func (s *StmtInfo) getSettedRuleByColumnName(column string) (router.Rule, bool, error) {
 	var columnExistsInShardingTables int // 记录分片表名出现在分片表中分片列的次数
-	var ret router2.Rule
+	var ret router.Rule
 	for _, r := range s.tableRules {
 		if r.GetShardingColumn() == column {
 			columnExistsInShardingTables++
@@ -319,7 +319,7 @@ func (s *StmtInfo) getSettedRuleByColumnName(column string) (router2.Rule, bool,
 func postHandleGlobalTableRouteResultInQuery(p *StmtInfo) error {
 	if len(p.tableRules) == 0 && len(p.globalTableRules) != 0 {
 		var tableName string
-		var rule router2.Rule
+		var rule router.Rule
 		for t, r := range p.globalTableRules {
 			tableName = t
 			rule = r
@@ -338,7 +338,7 @@ func postHandleGlobalTableRouteResultInQuery(p *StmtInfo) error {
 func postHandleGlobalTableRouteResultInModify(p *StmtInfo) error {
 	if len(p.tableRules) == 0 && len(p.globalTableRules) != 0 {
 		var tableName string
-		var rule router2.Rule
+		var rule router.Rule
 		for t, r := range p.globalTableRules {
 			tableName = t
 			rule = r
@@ -354,7 +354,7 @@ func postHandleGlobalTableRouteResultInModify(p *StmtInfo) error {
 // RecordSubqueryTableAlias 记录表名位置的子查询的别名, 便于后续处理
 // 返回已存在Rule的第一个 (任意一个即可)
 // 限制: 子查询中的表对应的路由规则必须与外层查询相关联, 或者为全局表
-func (t *TableAliasStmtInfo) RecordSubqueryTableAlias(alias string) (router2.Rule, error) {
+func (t *TableAliasStmtInfo) RecordSubqueryTableAlias(alias string) (router.Rule, error) {
 	if alias == "" {
 		return nil, fmt.Errorf("subquery table alias is nil")
 	}
@@ -368,7 +368,7 @@ func (t *TableAliasStmtInfo) RecordSubqueryTableAlias(alias string) (router2.Rul
 		return nil, fmt.Errorf("set subquery table alias error: %v", err)
 	}
 
-	var rule router2.Rule
+	var rule router.Rule
 	for _, r := range t.tableRules {
 		rule = r
 		break
@@ -379,7 +379,7 @@ func (t *TableAliasStmtInfo) RecordSubqueryTableAlias(alias string) (router2.Rul
 }
 
 // GetSettedRuleFromColumnInfo 用于WHERE条件或JOIN ON条件中, 查找列名对应的路由规则
-func (t *TableAliasStmtInfo) GetSettedRuleFromColumnInfo(db, table, column string) (router2.Rule, bool, bool, error) {
+func (t *TableAliasStmtInfo) GetSettedRuleFromColumnInfo(db, table, column string) (router.Rule, bool, bool, error) {
 	if db == "" && table == "" {
 		rule, need, err := t.getSettedRuleByColumnName(column)
 		return rule, need, false, err
@@ -390,9 +390,9 @@ func (t *TableAliasStmtInfo) GetSettedRuleFromColumnInfo(db, table, column strin
 }
 
 // 用于WHERE条件或JOIN ON条件中, 只存在列名时, 查找对应的路由规则
-func (t *TableAliasStmtInfo) getSettedRuleByColumnName(column string) (router2.Rule, bool, error) {
+func (t *TableAliasStmtInfo) getSettedRuleByColumnName(column string) (router.Rule, bool, error) {
 	var columnExistsInShardingTables int // 记录分片表名出现在分片表中分片列的次数
-	var ret router2.Rule
+	var ret router.Rule
 	for _, r := range t.tableRules {
 		if r.GetShardingColumn() == column {
 			columnExistsInShardingTables++
@@ -409,7 +409,7 @@ func (t *TableAliasStmtInfo) getSettedRuleByColumnName(column string) (router2.R
 
 // 获取FROM TABLE列表中的表数据
 // 用于FieldList和Where条件中列名的判断
-func (t *TableAliasStmtInfo) getSettedRuleFromTable(db, table string) (router2.Rule, bool, error) {
+func (t *TableAliasStmtInfo) getSettedRuleFromTable(db, table string) (router.Rule, bool, error) {
 	_, err := t.checkAndGetDB(db)
 	if err != nil {
 		return nil, false, err
@@ -435,7 +435,7 @@ func (t *TableAliasStmtInfo) getSettedRuleFromTable(db, table string) (router2.R
 }
 
 // RecordShardTable 将表信息记录到StmtInfo中, 并返回表信息对应的路由规则
-func (t *TableAliasStmtInfo) RecordShardTable(db, table, alias string) (router2.Rule, error) {
+func (t *TableAliasStmtInfo) RecordShardTable(db, table, alias string) (router.Rule, error) {
 	rule, err := t.StmtInfo.RecordShardTable(db, table)
 	if err != nil {
 		return nil, fmt.Errorf("record shard table error, db: %s, table: %s, alias: %s, err: %v", db, table, alias, err)
@@ -472,7 +472,7 @@ func (t *TableAliasStmtInfo) getAliasTable(alias string) (string, bool) {
 }
 
 // 根据StmtNode和路由信息生成分片SQL
-func generateShardingSQLs(stmt ast.StmtNode, result *RouteResult, router *router2.Router) (map[string]map[string][]string, error) {
+func generateShardingSQLs(stmt ast.StmtNode, result *RouteResult, router *router.Router) (map[string]map[string][]string, error) {
 	ret := make(map[string]map[string][]string)
 
 	for result.HasNext() {
@@ -505,7 +505,7 @@ func generateShardingSQLs(stmt ast.StmtNode, result *RouteResult, router *router
 }
 
 // 根据原始SQL生成后端对应slice和db的SQL
-func generateSQLResultFromOriginSQL(sql string, result *RouteResult, router *router2.Router) (map[string]map[string][]string, error) {
+func generateSQLResultFromOriginSQL(sql string, result *RouteResult, router *router.Router) (map[string]map[string][]string, error) {
 	rule := router.GetRule(result.db, result.table)
 	indexes := rule.GetSubTableIndexes()
 	ret := make(map[string]map[string][]string)

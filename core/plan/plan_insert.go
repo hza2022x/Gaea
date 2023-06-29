@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"github.com/XiaoMi/Gaea/backend/sequence"
 	common "github.com/XiaoMi/Gaea/common/constant"
-	router2 "github.com/XiaoMi/Gaea/core/router"
+	"github.com/XiaoMi/Gaea/core/router"
 	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"
@@ -43,7 +43,7 @@ type InsertPlan struct {
 }
 
 // NewInsertPlan constructor of InsertPlan
-func NewInsertPlan(db string, sql string, r *router2.Router, seq *sequence.SequenceManager) *InsertPlan {
+func NewInsertPlan(db string, sql string, r *router.Router, seq *sequence.SequenceManager) *InsertPlan {
 	return &InsertPlan{
 		StmtInfo:            NewStmtInfo(db, sql, r),
 		shardingColumnIndex: -1,
@@ -154,7 +154,7 @@ func handleInsertTableRefs(p *InsertPlan) (fastReturn bool, err error) {
 	tableSource.Source = decorator
 
 	// 如果是全局表, 则将记录写入所有分片
-	if rule.GetType() == router2.GlobalTableRuleType {
+	if rule.GetType() == router.GlobalTableRuleType {
 		p.result.db = rule.GetDB()
 		p.result.table = rule.GetTable()
 		p.result.indexes = rule.GetSubTableIndexes()
