@@ -41,8 +41,7 @@ var (
 type Factory func() (Resource, error)
 
 // Resource defines the interface that every resource must provide.
-// Thread synchronization between Close() and IsClosed()
-// is the responsibility of the caller.
+// Thread synchronization between Close() and IsClosed() is the responsibility of the caller.
 type Resource interface {
 	Close()
 }
@@ -255,7 +254,7 @@ func (rp *ResourcePool) SetCapacity(capacity int) error {
 	return nil
 }
 
-// SetCapacity changes the capacity of the pool.
+// ScaleCapacity changes the capacity of the pool.
 // You can use it to shrink or expand, but not beyond
 // the max capacity. If the change requires the pool
 // to be shrunk, SetCapacity waits till the necessary
