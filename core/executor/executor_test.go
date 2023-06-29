@@ -17,7 +17,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/XiaoMi/Gaea/proxy/server"
+	"github.com/go-ini/ini"
 	"testing"
 
 	"github.com/XiaoMi/Gaea/backend"
@@ -91,7 +91,7 @@ func TestExecute(t *testing.T) {
 	slice0MasterConn.On("SetCharset", "utf8", mysql.CharsetIds["utf8"]).Return(false, nil)
 	slice0MasterConn.On("SetSessionVariables", mysql.NewSessionVariables()).Return(false, nil)
 	slice0MasterConn.On("GetAddr").Return("127.0.0.1:3306")
-	slice0MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", server.defaultMaxSqlResultSize).Return(expectResult1, nil)
+	slice0MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", defaultMaxSqlResultSize).Return(expectResult1, nil)
 	slice0MasterConn.On("Recycle").Return(nil)
 
 	//slice-1
@@ -102,7 +102,7 @@ func TestExecute(t *testing.T) {
 	slice1MasterConn.On("SetCharset", "utf8", mysql.CharsetIds["utf8"]).Return(false, nil)
 	slice1MasterConn.On("SetSessionVariables", mysql.NewSessionVariables()).Return(false, nil)
 	slice1MasterConn.On("GetAddr").Return("127.0.0.1:3306")
-	slice1MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", server.defaultMaxSqlResultSize).Return(expectResult2, nil)
+	slice1MasterConn.On("Execute", "SELECT * FROM `tbl_mycat` WHERE `k`=0", defaultMaxSqlResultSize).Return(expectResult2, nil)
 	slice1MasterConn.On("Recycle").Return(nil)
 
 	sqls := map[string]map[string][]string{
@@ -134,15 +134,15 @@ func prepareSessionExecutor() (*SessionExecutor, error) {
 	if err != nil {
 		return nil, err
 	}
-	executor := newSessionExecutor(m)
-	executor.user = userName
+	executor := NewSessionExecutor(m)
+	executor.User = userName
 
 	collationID := 33 // "utf8"
 	executor.SetCollationID(mysql.CollationID(collationID))
 	executor.SetCharset("utf8")
 	// set database
 	executor.SetDatabase(database)
-	executor.namespace = namespaceName
+	executor.Namespace = namespaceName
 	return executor, nil
 }
 
