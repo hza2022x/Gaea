@@ -71,10 +71,10 @@ func TestExecute(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	slice0MasterPool := new(mocks.ConnectionPool)
-	slice0SlavePool := new(mocks.ConnectionPool)
-	slice1MasterPool := new(mocks.ConnectionPool)
-	slice1SlavePool := new(mocks.ConnectionPool)
+	slice0MasterPool := new(mocks.MockedConnectionPool)
+	slice0SlavePool := new(mocks.MockedConnectionPool)
+	slice1MasterPool := new(mocks.MockedConnectionPool)
+	slice1SlavePool := new(mocks.MockedConnectionPool)
 	se.Manager.GetNamespace("test_executor_namespace").slices["slice-0"].Master = slice0MasterPool
 	se.Manager.GetNamespace("test_executor_namespace").slices["slice-0"].Slave = []backend.ConnectionPool{slice0SlavePool}
 	se.Manager.GetNamespace("test_executor_namespace").slices["slice-1"].Master = slice1MasterPool
