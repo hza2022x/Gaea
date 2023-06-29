@@ -34,7 +34,7 @@ func NewRouter(namespace *models.Namespace) (*Router, error) {
 	}
 
 	// check default slice
-	if !includeSlice(sliceNames, namespace.DefaultSlice) {
+	if !IncludeSlice(sliceNames, namespace.DefaultSlice) {
 		return nil, fmt.Errorf("default slice[%s] not in the slice list",
 			namespace.DefaultSlice)
 	}
@@ -48,7 +48,7 @@ func NewRouter(namespace *models.Namespace) (*Router, error) {
 
 	for i, shard := range namespace.ShardRules {
 		for _, slice := range shard.Slices {
-			if !includeSlice(sliceNames, slice) {
+			if !IncludeSlice(sliceNames, slice) {
 				return nil, fmt.Errorf("shard table[%s] slice[%s] not in the namespace.slices list:[%s]",
 					shard.Table, slice, strings.Join(shard.Slices, ","))
 			}
@@ -60,7 +60,7 @@ func NewRouter(namespace *models.Namespace) (*Router, error) {
 			continue
 		}
 
-		rule, err := parseRule(shard)
+		rule, err := ParseRule(shard)
 		if err != nil {
 			return nil, err
 		}

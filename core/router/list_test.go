@@ -30,6 +30,7 @@ package router
 
 import (
 	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/core/algorithm"
 	"testing"
 )
 
@@ -47,33 +48,33 @@ func testCheckList(t *testing.T, l []int, checkList ...int) {
 
 func TestParseYearRange(t *testing.T) {
 	dateRange := "2014-2017"
-	years, err := ParseYearRange(dateRange)
+	years, err := algorithm.ParseYearRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
 	testCheckList(t, years, 2014, 2015, 2016, 2017)
 
 	dateRange = "2017-2013"
-	years, err = ParseYearRange(dateRange)
+	years, err = algorithm.ParseYearRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
 	testCheckList(t, years, 2013, 2014, 2015, 2016, 2017)
 
 	dateRange = "20120"
-	years, err = ParseYearRange(dateRange)
+	years, err = algorithm.ParseYearRange(dateRange)
 	if err != constant.ErrDateRangeIllegal || years != nil {
 		t.Fatal(err)
 	}
 
 	dateRange = "2o12"
-	years, err = ParseYearRange(dateRange)
+	years, err = algorithm.ParseYearRange(dateRange)
 	if err == nil || years != nil {
 		t.Failed()
 	}
 
 	dateRange = "2012"
-	years, err = ParseYearRange(dateRange)
+	years, err = algorithm.ParseYearRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +83,7 @@ func TestParseYearRange(t *testing.T) {
 
 func TestParseMonthRange(t *testing.T) {
 	dateRange := "201602-201610"
-	months, err := ParseMonthRange(dateRange)
+	months, err := algorithm.ParseMonthRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func TestParseMonthRange(t *testing.T) {
 	)
 
 	dateRange = "201603-201511"
-	months, err = ParseMonthRange(dateRange)
+	months, err = algorithm.ParseMonthRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,19 +115,19 @@ func TestParseMonthRange(t *testing.T) {
 	)
 
 	dateRange = "20120"
-	months, err = ParseMonthRange(dateRange)
+	months, err = algorithm.ParseMonthRange(dateRange)
 	if err != constant.ErrDateRangeIllegal || months != nil {
 		t.Fatal(err)
 	}
 
 	dateRange = "2012o1"
-	months, err = ParseMonthRange(dateRange)
+	months, err = algorithm.ParseMonthRange(dateRange)
 	if err == nil || months != nil {
 		t.Failed()
 	}
 
 	dateRange = "201201"
-	months, err = ParseMonthRange(dateRange)
+	months, err = algorithm.ParseMonthRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +136,7 @@ func TestParseMonthRange(t *testing.T) {
 
 func TestParseDayRange(t *testing.T) {
 	dateRange := "20160227-20160304"
-	days, err := ParseDayRange(dateRange)
+	days, err := algorithm.ParseDayRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +152,7 @@ func TestParseDayRange(t *testing.T) {
 	)
 
 	dateRange = "20160304-20160301"
-	days, err = ParseDayRange(dateRange)
+	days, err = algorithm.ParseDayRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -164,19 +165,19 @@ func TestParseDayRange(t *testing.T) {
 	)
 
 	dateRange = "2016034"
-	days, err = ParseDayRange(dateRange)
+	days, err = algorithm.ParseDayRange(dateRange)
 	if err != constant.ErrDateRangeIllegal || days != nil {
 		t.Fatal(err)
 	}
 
 	dateRange = "201603o4"
-	days, err = ParseDayRange(dateRange)
+	days, err = algorithm.ParseDayRange(dateRange)
 	if err == nil {
 		t.Failed()
 	}
 
 	dateRange = "20160304"
-	days, err = ParseDayRange(dateRange)
+	days, err = algorithm.ParseDayRange(dateRange)
 	if err != nil {
 		t.Fatal(err)
 	}

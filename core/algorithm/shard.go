@@ -30,7 +30,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package router
+package algorithm
 
 import (
 	"bytes"
@@ -152,16 +152,6 @@ func NumValue(value interface{}) int64 {
 		}
 	}
 	panic(NewKeyError("Unexpected key variable type %T", value))
-}
-
-type Shard interface {
-	FindForKey(key interface{}) (int, error)
-}
-
-/*一个范围的分片,例如[start,end)*/
-type RangeShard interface {
-	Shard
-	EqualStart(key interface{}, index int) bool
 }
 
 type HashShard struct {
