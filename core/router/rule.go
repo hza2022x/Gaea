@@ -30,8 +30,8 @@ package router
 
 import (
 	"fmt"
-	common "github.com/XiaoMi/Gaea/common/constant"
-	algorithm2 "github.com/XiaoMi/Gaea/core/algorithm"
+	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/core/algorithm"
 	"regexp"
 	"strconv"
 	"strings"
@@ -69,7 +69,7 @@ type BaseRule struct {
 	slices          []string    // not the namespace slices
 	subTableIndexes []int       //subTableIndexes store all the index of sharding sub-table
 	tableToSlice    map[int]int //key is table index, and value is slice index
-	shard           algorithm2.Shard
+	shard           algorithm.Shard
 
 	// TODO: 目前全局表也借用这两个field存放默认分片的物理DB名
 	mycatDatabases               []string
@@ -88,7 +88,7 @@ func NewDefaultRule(slice string) *BaseRule {
 	var r *BaseRule = &BaseRule{
 		ruleType:     DefaultRuleType,
 		slices:       []string{slice},
-		shard:        new(algorithm2.DefaultShard),
+		shard:        new(algorithm.DefaultShard),
 		tableToSlice: nil,
 	}
 	return r
@@ -110,7 +110,7 @@ func (r *BaseRule) IsLinkedRule() bool {
 	return false
 }
 
-func (r *BaseRule) GetShard() algorithm2.Shard {
+func (r *BaseRule) GetShard() algorithm.Shard {
 	return r.shard
 }
 
@@ -156,7 +156,7 @@ func (r *BaseRule) GetType() string {
 func (r *BaseRule) GetDatabaseNameByTableIndex(index int) (string, error) {
 	if IsMycatShardingRule(r.ruleType) || r.ruleType == GlobalTableRuleType {
 		if index > len(r.subTableIndexes) {
-			return "", common.ErrInvalidArgument
+			return "", constant.ErrInvalidArgument
 		}
 		return r.mycatDatabases[index], nil
 	}
@@ -196,7 +196,7 @@ func (l *LinkedRule) IsLinkedRule() bool {
 	return true
 }
 
-func (l *LinkedRule) GetShard() algorithm2.Shard {
+func (l *LinkedRule) GetShard() algorithm.Shard {
 	return l.linkToRule.GetShard()
 }
 
@@ -323,70 +323,70 @@ func ParseRule(cfg *models.Shard) (*BaseRule, error) {
 	return r, nil
 }
 
-func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, algorithm2.Shard, error) {
+func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, algorithm.Shard, error) {
 	switch cfg.Type {
 	case HashRuleType:
 		subTableIndexs, tableToSlice, err := parseHashRuleSliceInfos(cfg.Locations, cfg.Slices)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := &algorithm2.HashShard{ShardNum: len(tableToSlice)}
+		shard := &algorithm.HashShard{ShardNum: len(tableToSlice)}
 		return subTableIndexs, tableToSlice, shard, nil
 	case ModRuleType:
 		subTableIndexs, tableToSlice, err := parseHashRuleSliceInfos(cfg.Locations, cfg.Slices)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := &algorithm2.ModShard{ShardNum: len(tableToSlice)}
+		shard := &algorithm.ModShard{ShardNum: len(tableToSlice)}
 		return subTableIndexs, tableToSlice, shard, nil
 	case RangeRuleType:
 		subTableIndexs, tableToSlice, err := parseHashRuleSliceInfos(cfg.Locations, cfg.Slices)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		rs, err := algorithm2.ParseNumSharding(cfg.Locations, cfg.TableRowLimit)
+		rs, err := algorithm.ParseNumSharding(cfg.Locations, cfg.TableRowLimit)
 		if err != nil {
 			return nil, nil, nil, err
 		}
 		if len(rs) != len(tableToSlice) {
 			return nil, nil, nil, fmt.Errorf("range space %d not equal tables %d", len(rs), len(tableToSlice))
 		}
-		shard := &algorithm2.NumRangeShard{Shards: rs}
+		shard := &algorithm.NumRangeShard{Shards: rs}
 		return subTableIndexs, tableToSlice, shard, nil
 	case DateDayRuleType:
 		subTableIndexs, tableToSlice, err := parseDateDayRuleSliceInfos(cfg.DateRange, cfg.Slices)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := &algorithm2.DateDayShard{}
+		shard := &algorithm.DateDayShard{}
 		return subTableIndexs, tableToSlice, shard, nil
 	case DateMonthRuleType:
 		subTableIndexs, tableToSlice, err := parseDateMonthRuleSliceInfos(cfg.DateRange, cfg.Slices)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := &algorithm2.DateMonthShard{}
+		shard := &algorithm.DateMonthShard{}
 		return subTableIndexs, tableToSlice, shard, nil
 	case DateYearRuleType:
 		subTableIndexs, tableToSlice, err := parseDateYearRuleSliceInfos(cfg.DateRange, cfg.Slices)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := &algorithm2.DateYearShard{}
+		shard := &algorithm.DateYearShard{}
 		return subTableIndexs, tableToSlice, shard, nil
 	case MycatModRuleType:
 		subTableIndexs, tableToSlice, err := parseMycatHashRuleSliceInfos(cfg.Locations, cfg.Slices, cfg.Databases)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := algorithm2.NewMycatPartitionModShard(len(tableToSlice))
+		shard := algorithm.NewMycatPartitionModShard(len(tableToSlice))
 		return subTableIndexs, tableToSlice, shard, nil
 	case MycatLongRuleType:
 		subTableIndexs, tableToSlice, err := parseMycatHashRuleSliceInfos(cfg.Locations, cfg.Slices, cfg.Databases)
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := algorithm2.NewMycatPartitionLongShard(len(tableToSlice), cfg.PartitionCount, cfg.PartitionLength)
+		shard := algorithm.NewMycatPartitionLongShard(len(tableToSlice), cfg.PartitionCount, cfg.PartitionLength)
 		if err = shard.Init(); err != nil {
 			return nil, nil, nil, err
 		}
@@ -396,7 +396,7 @@ func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, algorithm2.Shar
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := algorithm2.NewMycatPartitionStringShard(len(tableToSlice), cfg.PartitionCount, cfg.PartitionLength, cfg.HashSlice)
+		shard := algorithm.NewMycatPartitionStringShard(len(tableToSlice), cfg.PartitionCount, cfg.PartitionLength, cfg.HashSlice)
 		if err = shard.Init(); err != nil {
 			return nil, nil, nil, err
 		}
@@ -407,7 +407,7 @@ func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, algorithm2.Shar
 			return nil, nil, nil, err
 		}
 
-		shard, err := algorithm2.NewMycatPartitionMurmurHashShard(cfg.Seed, cfg.VirtualBucketTimes, len(tableToSlice))
+		shard, err := algorithm.NewMycatPartitionMurmurHashShard(cfg.Seed, cfg.VirtualBucketTimes, len(tableToSlice))
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -421,7 +421,7 @@ func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, algorithm2.Shar
 			return nil, nil, nil, err
 		}
 
-		shard, err := algorithm2.GetMycatPartitionPaddingModShard(cfg.PadFrom, cfg.PadLength, cfg.ModBegin, cfg.ModEnd, len(tableToSlice))
+		shard, err := algorithm.GetMycatPartitionPaddingModShard(cfg.PadFrom, cfg.PadLength, cfg.ModBegin, cfg.ModEnd, len(tableToSlice))
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -434,10 +434,10 @@ func parseRuleSliceInfos(cfg *models.Shard) ([]int, map[int]int, algorithm2.Shar
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		shard := algorithm2.NewGlobalTableShard()
+		shard := algorithm.NewGlobalTableShard()
 		return subTableIndexs, tableToSlice, shard, nil
 	default:
-		return nil, nil, nil, common.ErrUnknownRuleType
+		return nil, nil, nil, constant.ErrUnknownRuleType
 	}
 }
 
@@ -447,7 +447,7 @@ func parseHashRuleSliceInfos(locations []int, slices []string) ([]int, map[int]i
 	tableToSlice := make(map[int]int, 0)
 
 	if len(locations) != len(slices) {
-		return nil, nil, common.ErrLocationsCount
+		return nil, nil, constant.ErrLocationsCount
 	}
 	for i := 0; i < len(locations); i++ {
 		for j := 0; j < locations[i]; j++ {
@@ -471,7 +471,7 @@ func parseMycatHashRuleSliceInfos(locations []int, slices []string, databases []
 	}
 
 	if len(tableToSlice) != len(realDatabaseList) {
-		return nil, nil, common.ErrLocationsCount
+		return nil, nil, constant.ErrLocationsCount
 	}
 
 	return subTableIndexs, tableToSlice, nil
@@ -482,15 +482,15 @@ func parseDateDayRuleSliceInfos(dateRange []string, slices []string) ([]int, map
 	tableToSlice := make(map[int]int, 0)
 
 	if len(dateRange) != len(slices) {
-		return nil, nil, common.ErrDateRangeCount
+		return nil, nil, constant.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
-		dayNumbers, err := algorithm2.ParseDayRange(dateRange[i])
+		dayNumbers, err := algorithm.ParseDayRange(dateRange[i])
 		if err != nil {
 			return nil, nil, err
 		}
 		if len(subTableIndexs) > 0 && dayNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return nil, nil, common.ErrDateRangeOverlap
+			return nil, nil, constant.ErrDateRangeOverlap
 		}
 		for _, v := range dayNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -505,15 +505,15 @@ func parseDateMonthRuleSliceInfos(dateRange []string, slices []string) ([]int, m
 	tableToSlice := make(map[int]int, 0)
 
 	if len(dateRange) != len(slices) {
-		return nil, nil, common.ErrDateRangeCount
+		return nil, nil, constant.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
-		monthNumbers, err := algorithm2.ParseMonthRange(dateRange[i])
+		monthNumbers, err := algorithm.ParseMonthRange(dateRange[i])
 		if err != nil {
 			return nil, nil, err
 		}
 		if len(subTableIndexs) > 0 && monthNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return nil, nil, common.ErrDateRangeOverlap
+			return nil, nil, constant.ErrDateRangeOverlap
 		}
 		for _, v := range monthNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -528,15 +528,15 @@ func parseDateYearRuleSliceInfos(dateRange []string, slices []string) ([]int, ma
 	tableToSlice := make(map[int]int, 0)
 
 	if len(dateRange) != len(slices) {
-		return nil, nil, common.ErrDateRangeCount
+		return nil, nil, constant.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
-		yearNumbers, err := algorithm2.ParseYearRange(dateRange[i])
+		yearNumbers, err := algorithm.ParseYearRange(dateRange[i])
 		if err != nil {
 			return nil, nil, err
 		}
 		if len(subTableIndexs) > 0 && yearNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return nil, nil, common.ErrDateRangeOverlap
+			return nil, nil, constant.ErrDateRangeOverlap
 		}
 		for _, v := range yearNumbers {
 			tableToSlice[v] = i
@@ -558,7 +558,7 @@ func parseGlobalTableRuleSliceInfos(locations []int, slices []string, databases 
 			return nil, nil, err
 		}
 		if len(tableToSlice) != len(realDatabaseList) {
-			return nil, nil, common.ErrLocationsCount
+			return nil, nil, constant.ErrLocationsCount
 		}
 	}
 

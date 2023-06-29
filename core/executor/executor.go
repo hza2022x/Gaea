@@ -17,8 +17,8 @@ package executor
 import (
 	"context"
 	"fmt"
-	common "github.com/XiaoMi/Gaea/common/constant"
-	plan2 "github.com/XiaoMi/Gaea/core/plan"
+	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/core/plan"
 	"github.com/XiaoMi/Gaea/core/router"
 	"runtime"
 	"strconv"
@@ -106,7 +106,7 @@ func (se *SessionExecutor) setStringSessionVariable(name string, valueStr string
 func (se *SessionExecutor) setGeneralLogVariable(valueStr string) error {
 	v, err := strconv.Atoi(valueStr)
 	if err != nil {
-		return common.ErrInvalidArgument
+		return constant.ErrInvalidArgument
 	}
 	atomic.StoreUint32(&ProcessGeneralLog, uint32(v))
 	return nil
@@ -289,10 +289,10 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 
 	parallel := len(pcs)
 	if parallel != len(sqls) {
-		log.Warn("Session executeInMultiSlices error, conns: %v, sqls: %v, error: %s", pcs, sqls, common.ErrConnNotEqual.Error())
-		return nil, common.ErrConnNotEqual
+		log.Warn("Session executeInMultiSlices error, conns: %v, sqls: %v, error: %s", pcs, sqls, constant.ErrConnNotEqual.Error())
+		return nil, constant.ErrConnNotEqual
 	} else if parallel == 0 {
-		return nil, common.ErrNoPlan
+		return nil, constant.ErrNoPlan
 	}
 
 	var ctx = context.Background()
@@ -371,7 +371,7 @@ func (se *SessionExecutor) executeInMultiSlices(reqCtx *util.RequestContext, pcs
 			for j := 0; j < len(pcsUnCompleted); j++ {
 				<-done
 			}
-			return nil, fmt.Errorf("%v %dms", common.ErrTimeLimitExceeded, maxExecuteTime)
+			return nil, fmt.Errorf("%v %dms", constant.ErrTimeLimitExceeded, maxExecuteTime)
 		}
 	}
 
@@ -437,7 +437,7 @@ func createShowDatabaseResult(dbs []string) *mysql.Result {
 		Resultset:    r,
 	}
 
-	plan2.GenerateSelectResultRowData(result)
+	plan.GenerateSelectResultRowData(result)
 	return result
 }
 
@@ -460,7 +460,7 @@ func createShowGeneralLogResult() *mysql.Result {
 		Resultset:    r,
 	}
 
-	plan2.GenerateSelectResultRowData(result)
+	plan.GenerateSelectResultRowData(result)
 	return result
 }
 
@@ -653,7 +653,7 @@ func (se *SessionExecutor) HandleQuery(sql string) (r *mysql.Result, err error) 
 					sql, err.Error(), string(buf))
 			}
 
-			err = common.ErrInternalServer
+			err = constant.ErrInternalServer
 			return
 		}
 	}()
@@ -754,7 +754,7 @@ func (se *SessionExecutor) HandleUseDB(dbName string) error {
 	return mysql.NewDefaultError(mysql.ErrNoDB)
 }
 
-func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan2.Plan, error) {
+func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan.Plan, error) {
 	n, err := se.Parse(sql)
 	if err != nil {
 		return nil, fmt.Errorf("parse sql error, sql: %s, err: %v", sql, err)
@@ -763,7 +763,7 @@ func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan2.
 	rt := ns.GetRouter()
 	seq := ns.GetSequences()
 	phyDBs := ns.GetPhysicalDBs()
-	p, err := plan2.BuildPlan(n, phyDBs, db, sql, rt, seq)
+	p, err := plan.BuildPlan(n, phyDBs, db, sql, rt, seq)
 	if err != nil {
 		return nil, fmt.Errorf("create select plan error: %v", err)
 	}

@@ -36,7 +36,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	common "github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"hash/crc32"
 	"strconv"
 	"time"
@@ -184,7 +184,7 @@ func (s *NumRangeShard) FindForKey(key interface{}) (int, error) {
 			return i, nil
 		}
 	}
-	return -1, common.ErrKeyOutOfRange
+	return -1, constant.ErrKeyOutOfRange
 }
 
 func (s *NumRangeShard) EqualStart(key interface{}, index int) bool {

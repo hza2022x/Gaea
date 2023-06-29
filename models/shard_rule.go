@@ -16,7 +16,7 @@ package models
 
 import (
 	"fmt"
-	common "github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"strconv"
 	"strings"
 )
@@ -152,7 +152,7 @@ func verifyHashRuleSliceInfos(locations []int, slices []string) (map[int]int, er
 	tableToSlice := make(map[int]int, 0)
 
 	if len(locations) != len(slices) {
-		return nil, common.ErrLocationsCount
+		return nil, constant.ErrLocationsCount
 	}
 	for i := 0; i < len(locations); i++ {
 		for j := 0; j < locations[i]; j++ {
@@ -175,7 +175,7 @@ func verifyMycatHashRuleSliceInfos(locations []int, slices []string, databases [
 	}
 
 	if len(tableToSlice) != len(realDatabaseList) {
-		return nil, common.ErrLocationsCount
+		return nil, constant.ErrLocationsCount
 	}
 
 	return tableToSlice, nil
@@ -184,7 +184,7 @@ func verifyMycatHashRuleSliceInfos(locations []int, slices []string, databases [
 func verifyDateDayRuleSliceInfos(dateRange []string, slices []string) error {
 	var subTableIndexs []int
 	if len(dateRange) != len(slices) {
-		return common.ErrDateRangeCount
+		return constant.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
 		dayNumbers, err := ParseDayRange(dateRange[i])
@@ -192,7 +192,7 @@ func verifyDateDayRuleSliceInfos(dateRange []string, slices []string) error {
 			return err
 		}
 		if len(subTableIndexs) > 0 && dayNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return common.ErrDateRangeOverlap
+			return constant.ErrDateRangeOverlap
 		}
 		for _, v := range dayNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -204,7 +204,7 @@ func verifyDateDayRuleSliceInfos(dateRange []string, slices []string) error {
 func verifyDateMonthRuleSliceInfos(dateRange []string, slices []string) error {
 	var subTableIndexs []int
 	if len(dateRange) != len(slices) {
-		return common.ErrDateRangeCount
+		return constant.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
 		monthNumbers, err := ParseMonthRange(dateRange[i])
@@ -212,7 +212,7 @@ func verifyDateMonthRuleSliceInfos(dateRange []string, slices []string) error {
 			return err
 		}
 		if len(subTableIndexs) > 0 && monthNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return common.ErrDateRangeOverlap
+			return constant.ErrDateRangeOverlap
 		}
 		for _, v := range monthNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -224,7 +224,7 @@ func verifyDateMonthRuleSliceInfos(dateRange []string, slices []string) error {
 func verifyDateYearRuleSliceInfos(dateRange []string, slices []string) error {
 	var subTableIndexs []int
 	if len(dateRange) != len(slices) {
-		return common.ErrDateRangeCount
+		return constant.ErrDateRangeCount
 	}
 	for i := 0; i < len(dateRange); i++ {
 		yearNumbers, err := ParseYearRange(dateRange[i])
@@ -232,7 +232,7 @@ func verifyDateYearRuleSliceInfos(dateRange []string, slices []string) error {
 			return err
 		}
 		if len(subTableIndexs) > 0 && yearNumbers[0] <= subTableIndexs[len(subTableIndexs)-1] {
-			return common.ErrDateRangeOverlap
+			return constant.ErrDateRangeOverlap
 		}
 		for _, v := range yearNumbers {
 			subTableIndexs = append(subTableIndexs, v)
@@ -253,7 +253,7 @@ func verifyGlobalTableRuleSliceInfos(locations []int, slices []string, databases
 			return err
 		}
 		if len(tableToSlice) != len(realDatabaseList) {
-			return common.ErrLocationsCount
+			return constant.ErrLocationsCount
 		}
 	}
 	return nil

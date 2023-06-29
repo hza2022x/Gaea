@@ -15,7 +15,7 @@
 package backend
 
 import (
-	common "github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"math/rand"
 	"time"
 )
@@ -93,7 +93,7 @@ func (b *balancer) next() (int, error) {
 	var index int
 	queueLen := len(b.roundRobinQ)
 	if queueLen == 0 {
-		return 0, common.ErrNoDatabase
+		return 0, constant.ErrNoDatabase
 	}
 	if queueLen == 1 {
 		index = b.roundRobinQ[0]
@@ -103,7 +103,7 @@ func (b *balancer) next() (int, error) {
 	b.lastIndex = b.lastIndex % queueLen
 	index = b.roundRobinQ[b.lastIndex]
 	if index >= b.total {
-		return 0, common.ErrNoDatabase
+		return 0, constant.ErrNoDatabase
 	}
 	b.lastIndex++
 	b.lastIndex = b.lastIndex % queueLen

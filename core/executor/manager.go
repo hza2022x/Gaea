@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
-	common "github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"net/http"
 	"sort"
 	"strconv"
@@ -208,7 +208,7 @@ func (m *Manager) ReloadNamespacePrepare(namespaceConfig *models.Namespace) erro
 // ReloadNamespaceCommit commit config
 func (m *Manager) ReloadNamespaceCommit(name string) error {
 	if !m.reloadPrepared.CompareAndSwap(true, false) {
-		err := common.ErrNamespaceNotPrepared
+		err := constant.ErrNamespaceNotPrepared
 		log.Warn("commit namespace error, namespace: %s, err: %v", name, err)
 		return err
 	}

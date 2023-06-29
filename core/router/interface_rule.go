@@ -1,13 +1,13 @@
 package router
 
-import algorithm2 "github.com/XiaoMi/Gaea/core/algorithm"
+import "github.com/XiaoMi/Gaea/core/algorithm"
 
 type Rule interface {
 	GetDB() string
 	GetTable() string
 	GetShardingColumn() string
 	IsLinkedRule() bool
-	GetShard() algorithm2.Shard
+	GetShard() algorithm.Shard
 	FindTableIndex(key interface{}) (int, error)
 	GetSlice(i int) string // i is slice index
 	GetSliceIndexFromTableIndex(i int) int

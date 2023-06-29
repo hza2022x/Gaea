@@ -16,7 +16,7 @@ package algorithm
 
 import (
 	"fmt"
-	common "github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/common/constant"
 	"math"
 	"strconv"
 	"strings"
@@ -78,7 +78,7 @@ func ParseDayRange(dateRange string) ([]int, error) {
 	dateTmp := strings.SplitN(dateRange, "-", 2)
 	if len(dateTmp) == 1 {
 		if len(dateTmp[0]) != dateLength {
-			return nil, common.ErrDateRangeIllegal
+			return nil, constant.ErrDateRangeIllegal
 		}
 		dateNum, err := strconv.Atoi(dateTmp[0])
 		if err != nil {
@@ -87,10 +87,10 @@ func ParseDayRange(dateRange string) ([]int, error) {
 		return []int{dateNum}, nil
 	}
 	if len(dateTmp) != 2 {
-		return nil, common.ErrDateRangeIllegal
+		return nil, constant.ErrDateRangeIllegal
 	}
 	if len(dateTmp[0]) != dateLength || len(dateTmp[1]) != dateLength {
-		return nil, common.ErrDateRangeIllegal
+		return nil, constant.ErrDateRangeIllegal
 	}
 	//change the begin day and the end day
 	if dateTmp[1] < dateTmp[0] {
@@ -131,7 +131,7 @@ func ParseMonthRange(dateRange string) ([]int, error) {
 	dateTmp := strings.SplitN(dateRange, "-", 2)
 	if len(dateTmp) == 1 {
 		if len(dateTmp[0]) != dateLength {
-			return nil, common.ErrDateRangeIllegal
+			return nil, constant.ErrDateRangeIllegal
 		}
 		dateNum, err := strconv.Atoi(dateTmp[0])
 		if err != nil {
@@ -140,10 +140,10 @@ func ParseMonthRange(dateRange string) ([]int, error) {
 		return []int{dateNum}, nil
 	}
 	if len(dateTmp) != 2 {
-		return nil, common.ErrDateRangeIllegal
+		return nil, constant.ErrDateRangeIllegal
 	}
 	if len(dateTmp[0]) != dateLength || len(dateTmp[1]) != dateLength {
-		return nil, common.ErrDateRangeIllegal
+		return nil, constant.ErrDateRangeIllegal
 	}
 	//change the begin month and the end month
 	if dateTmp[1] < dateTmp[0] {
@@ -194,7 +194,7 @@ func ParseYearRange(dateRange string) ([]int, error) {
 	dateTmp := strings.SplitN(dateRange, "-", 2)
 	if len(dateTmp) == 1 {
 		if len(dateTmp[0]) != dateLength {
-			return nil, common.ErrDateRangeIllegal
+			return nil, constant.ErrDateRangeIllegal
 		}
 		dateNum, err := strconv.Atoi(dateTmp[0])
 		if err != nil {
@@ -203,7 +203,7 @@ func ParseYearRange(dateRange string) ([]int, error) {
 		return []int{dateNum}, nil
 	}
 	if len(dateTmp) != 2 {
-		return nil, common.ErrDateRangeIllegal
+		return nil, constant.ErrDateRangeIllegal
 	}
 	//change the begin year and the end year
 	if dateTmp[1] < dateTmp[0] {
