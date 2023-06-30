@@ -198,7 +198,7 @@ func (se *SessionExecutor) HandleStmtExecute(data []byte) (*mysql.Result, error)
 	defer s.ResetParams()
 
 	// execute sql using ComQuery
-	r, err := se.HandleQuery(executeSQL)
+	r, err := se.HandleDMLQuery(executeSQL)
 	if err != nil {
 		return nil, err
 	}

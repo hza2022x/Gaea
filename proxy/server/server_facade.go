@@ -16,9 +16,10 @@ func ExecuteCommand(cmd byte, data []byte, se *executor.SessionExecutor) Respons
 		// either a connection close or a OK_Packet, OK_Packet will cause client RST sometimes, but doesn't affect sql execute
 		return CreateNoopResponse()
 	case mysql.ComQuery: // data type: string[EOF]
+		//DML统一为Query
 		sql := string(data)
 		// handle phase
-		r, err := se.HandleQuery(sql)
+		r, err := se.HandleDMLQuery(sql)
 		if err != nil {
 			return CreateErrorResponse(se.Status, err)
 		}

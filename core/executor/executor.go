@@ -639,7 +639,7 @@ func (se *SessionExecutor) Parse(sql string) (ast.StmtNode, error) {
 }
 
 // 处理query语句
-func (se *SessionExecutor) HandleQuery(sql string) (r *mysql.Result, err error) {
+func (se *SessionExecutor) HandleDMLQuery(sql string) (r *mysql.Result, err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			log.Warn("handle query command failed, error: %v, sql: %s", e, sql)
