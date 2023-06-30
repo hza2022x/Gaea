@@ -54,14 +54,14 @@ func (m *Manager) Close() {
 }
 
 // ReloadNamespacePrepare prepare commit
-func (m *Manager) ReloadNamespacePrepare(namespaceConfig *models.Namespace) error {
-	name := namespaceConfig.Name
+func (m *Manager) ReloadNamespacePrepare(ns *models.Namespace) error {
+	name := ns.Name
 	current, other, _ := m.switchIndex.Get()
 
 	// reload namespace prepare
 	currentNamespaceManager := m.namespaces[current]
 	newNamespaceManager := ShallowCopyNamespaceManager(currentNamespaceManager)
-	if err := newNamespaceManager.RebuildNamespace(namespaceConfig); err != nil {
+	if err := newNamespaceManager.RebuildNamespace(ns); err != nil {
 		log.Warn("prepare config of namespace: %s failed, err: %v", name, err)
 		return err
 	}
@@ -70,7 +70,7 @@ func (m *Manager) ReloadNamespacePrepare(namespaceConfig *models.Namespace) erro
 	// reload user prepare
 	currentUserManager := m.users[current]
 	newUserManager := CloneUserManager(currentUserManager)
-	newUserManager.RebuildNamespaceUsers(namespaceConfig)
+	newUserManager.RebuildNamespaceUsers(ns)
 	m.users[other] = newUserManager
 	m.reloadPrepared.Set(true)
 
