@@ -42,7 +42,7 @@ func main() {
 
 	fmt.Printf("Build Version Information:%s\n", constant.Info.LongForm())
 
-	// init config of gaea proxy
+	// init config of Proxy
 	cfg, err := models.ParseProxyConfigFromFile(*configFile)
 	if err != nil {
 		fmt.Printf("parse config file error:%v\n", err.Error())
