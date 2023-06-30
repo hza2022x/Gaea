@@ -17,7 +17,7 @@ package executor
 import (
 	"errors"
 	"fmt"
-	sequence2 "github.com/XiaoMi/Gaea/backend/sequence"
+	"github.com/XiaoMi/Gaea/backend/sequence"
 	"github.com/XiaoMi/Gaea/core/plan"
 	"github.com/XiaoMi/Gaea/core/router"
 	"net"
@@ -62,7 +62,7 @@ type Namespace struct {
 	slowSQLTime        int64             // session slow sql time, millisecond, default 1000
 	allowips           []util.IPInfo
 	router             *router.Router
-	sequences          *sequence2.SequenceManager
+	sequences          *sequence.SequenceManager
 	slices             map[string]*backend.Slice // key: slice name
 	userProperties     map[string]*UserProperty  // key: user name ,value: user's properties
 	defaultCharset     string
@@ -177,14 +177,14 @@ func NewNamespace(namespaceConfig *models.Namespace) (*Namespace, error) {
 
 	// init global sequences config
 	// 目前只支持基于mysql的序列号
-	sequences := sequence2.NewSequenceManager()
+	sequences := sequence.NewSequenceManager()
 	for _, v := range namespaceConfig.GlobalSequences {
 		globalSequenceSlice, ok := namespace.slices[v.SliceName]
 		if !ok {
 			return nil, fmt.Errorf("init global sequence error: slice not found, sequence: %v", v)
 		}
 		seqName := strings.ToUpper(v.DB) + "." + strings.ToUpper(v.Table)
-		seq := sequence2.NewMySQLSequence(globalSequenceSlice, seqName, v.PKName)
+		seq := sequence.NewMySQLSequence(globalSequenceSlice, seqName, v.PKName)
 		sequences.SetSequence(v.DB, v.Table, seq)
 	}
 	namespace.sequences = sequences
@@ -207,7 +207,7 @@ func (n *Namespace) GetRouter() *router.Router {
 	return n.router
 }
 
-func (n *Namespace) GetSequences() *sequence2.SequenceManager {
+func (n *Namespace) GetSequences() *sequence.SequenceManager {
 	return n.sequences
 }
 

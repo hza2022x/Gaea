@@ -176,7 +176,7 @@ func buildShardPlan(stmt ast.StmtNode, db string, sql string, router *router.Rou
 		}
 		return plan, nil
 	case *ast.InsertStmt:
-		// InsertStmt contains REPLACE statement
+		// InsertStmt contains REPLACE statement. 此处只返回空plan
 		plan := NewInsertPlan(db, sql, router, seq)
 		if err := HandleInsertStmt(plan, stmtType); err != nil {
 			return nil, err

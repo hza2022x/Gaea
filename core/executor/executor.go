@@ -760,10 +760,10 @@ func (se *SessionExecutor) getPlan(ns *Namespace, db string, sql string) (plan.P
 		return nil, fmt.Errorf("parse sql error, sql: %s, err: %v", sql, err)
 	}
 
-	rt := ns.GetRouter()
+	router := ns.GetRouter()
 	seq := ns.GetSequences()
 	phyDBs := ns.GetPhysicalDBs()
-	p, err := plan.BuildPlan(n, phyDBs, db, sql, rt, seq)
+	p, err := plan.BuildPlan(n, phyDBs, db, sql, router, seq)
 	if err != nil {
 		return nil, fmt.Errorf("create select plan error: %v", err)
 	}

@@ -87,11 +87,12 @@ func NewRouter(namespace *models.Namespace) (*Router, error) {
 	return rt, nil
 }
 
+// GetShardRule 获取规则 可否将规则放到全局Context中？TODO
 func (r *Router) GetShardRule(db, table string) (Rule, bool) {
-	arry := strings.Split(table, ".")
-	if len(arry) == 2 {
-		table = strings.Trim(arry[1], "`")
-		db = strings.Trim(arry[0], "`")
+	dbTables := strings.Split(table, ".")
+	if len(dbTables) == 2 {
+		table = strings.Trim(dbTables[1], "`")
+		db = strings.Trim(dbTables[0], "`")
 	}
 	rule, ok := r.rules[db][table]
 	return rule, ok
