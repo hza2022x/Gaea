@@ -255,7 +255,7 @@ func (m *Manager) RecordBackendSQLMetrics(reqCtx *util.RequestContext, namespace
 	}
 }
 
-func (m *Manager) startConnectPoolMetricsTask(interval int) {
+func (m *Manager) startPoolMetricsTask(interval int) {
 	if interval <= 0 {
 		interval = 10
 	}
@@ -284,18 +284,18 @@ func (m *Manager) recordBackendConnectPoolMetrics(namespace string) {
 	}
 
 	for sliceName, slice := range ns.slices {
-		m.statistics.recordConnectPoolInuseCount(namespace, sliceName, slice.Master.Addr(), slice.Master.InUse())
-		m.statistics.recordConnectPoolIdleCount(namespace, sliceName, slice.Master.Addr(), slice.Master.Available())
-		m.statistics.recordConnectPoolWaitCount(namespace, sliceName, slice.Master.Addr(), slice.Master.WaitCount())
+		m.statistics.recordPoolInuseCount(namespace, sliceName, slice.Master.Addr(), slice.Master.InUse())
+		m.statistics.recordPoolIdleCount(namespace, sliceName, slice.Master.Addr(), slice.Master.Available())
+		m.statistics.recordPoolWaitCount(namespace, sliceName, slice.Master.Addr(), slice.Master.WaitCount())
 		for _, slave := range slice.Slave {
-			m.statistics.recordConnectPoolInuseCount(namespace, sliceName, slave.Addr(), slave.InUse())
-			m.statistics.recordConnectPoolIdleCount(namespace, sliceName, slave.Addr(), slave.Available())
-			m.statistics.recordConnectPoolWaitCount(namespace, sliceName, slave.Addr(), slave.WaitCount())
+			m.statistics.recordPoolInuseCount(namespace, sliceName, slave.Addr(), slave.InUse())
+			m.statistics.recordPoolIdleCount(namespace, sliceName, slave.Addr(), slave.Available())
+			m.statistics.recordPoolWaitCount(namespace, sliceName, slave.Addr(), slave.WaitCount())
 		}
 		for _, statisticSlave := range slice.StatisticSlave {
-			m.statistics.recordConnectPoolInuseCount(namespace, sliceName, statisticSlave.Addr(), statisticSlave.InUse())
-			m.statistics.recordConnectPoolIdleCount(namespace, sliceName, statisticSlave.Addr(), statisticSlave.Available())
-			m.statistics.recordConnectPoolWaitCount(namespace, sliceName, statisticSlave.Addr(), statisticSlave.WaitCount())
+			m.statistics.recordPoolInuseCount(namespace, sliceName, statisticSlave.Addr(), statisticSlave.InUse())
+			m.statistics.recordPoolIdleCount(namespace, sliceName, statisticSlave.Addr(), statisticSlave.Available())
+			m.statistics.recordPoolWaitCount(namespace, sliceName, statisticSlave.Addr(), statisticSlave.WaitCount())
 		}
 	}
 }

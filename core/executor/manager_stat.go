@@ -156,19 +156,19 @@ func (s *StatisticManager) AddWriteFlowCount(namespace string, byteCount int) {
 }
 
 // record idle connect count
-func (s *StatisticManager) recordConnectPoolIdleCount(namespace string, slice string, addr string, count int64) {
+func (s *StatisticManager) recordPoolIdleCount(namespace string, slice string, addr string, count int64) {
 	statsKey := []string{s.clusterName, namespace, slice, addr}
 	s.backendConnectPoolIdleCounts.Set(statsKey, count)
 }
 
 // record in-use connect count
-func (s *StatisticManager) recordConnectPoolInuseCount(namespace string, slice string, addr string, count int64) {
+func (s *StatisticManager) recordPoolInuseCount(namespace string, slice string, addr string, count int64) {
 	statsKey := []string{s.clusterName, namespace, slice, addr}
 	s.backendConnectPoolInUseCounts.Set(statsKey, count)
 }
 
 // record wait queue length
-func (s *StatisticManager) recordConnectPoolWaitCount(namespace string, slice string, addr string, count int64) {
+func (s *StatisticManager) recordPoolWaitCount(namespace string, slice string, addr string, count int64) {
 	statsKey := []string{s.clusterName, namespace, slice, addr}
 	s.backendConnectPoolWaitCounts.Set(statsKey, count)
 }

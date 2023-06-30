@@ -47,6 +47,6 @@ func CreateManager(cfg *models.Proxy, namespaceConfigs map[string]*models.Namesp
 	}
 	m.users[current] = user
 
-	m.startConnectPoolMetricsTask(cfg.StatsInterval)
+	m.startPoolMetricsTask(cfg.StatsInterval)
 	return m, nil
 }
