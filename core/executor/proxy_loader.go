@@ -182,34 +182,34 @@ func (s *StatisticManager) Init(cfg *models.Proxy) error {
 	}
 
 	s.sqlTimings = stats.NewMultiTimings("SqlTimings",
-		"gaea proxy sql sqlTimings", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
+		"sql sqlTimings", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
 	s.sqlFingerprintSlowCounts = stats.NewCountersWithMultiLabels("SqlFingerprintSlowCounts",
-		"gaea proxy sql fingerprint slow counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
+		"sql fingerprint slow counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
 	s.sqlErrorCounts = stats.NewCountersWithMultiLabels("SqlErrorCounts",
-		"gaea proxy sql error counts per error type", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
+		"sql error counts per error type", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
 	s.sqlFingerprintErrorCounts = stats.NewCountersWithMultiLabels("SqlFingerprintErrorCounts",
-		"gaea proxy sql fingerprint error counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
+		"sql fingerprint error counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
 	s.sqlForbidenCounts = stats.NewCountersWithMultiLabels("SqlForbiddenCounts",
-		"gaea proxy sql error counts per error type", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
+		"sql error counts per error type", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
 	s.flowCounts = stats.NewCountersWithMultiLabels("FlowCounts",
-		"gaea proxy flow counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFlowDirection})
+		"flow counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFlowDirection})
 	s.sessionCounts = stats.NewGaugesWithMultiLabels("SessionCounts",
-		"gaea proxy session counts", []string{statsLabelCluster, statsLabelNamespace})
+		"session counts", []string{statsLabelCluster, statsLabelNamespace})
 
 	s.backendSQLTimings = stats.NewMultiTimings("BackendSqlTimings",
-		"gaea proxy backend sql sqlTimings", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
+		"backend sql sqlTimings", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
 	s.backendSQLFingerprintSlowCounts = stats.NewCountersWithMultiLabels("BackendSqlFingerprintSlowCounts",
-		"gaea proxy backend sql fingerprint slow counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
+		"backend sql fingerprint slow counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
 	s.backendSQLErrorCounts = stats.NewCountersWithMultiLabels("BackendSqlErrorCounts",
-		"gaea proxy backend sql error counts per error type", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
+		"backend sql error counts per error type", []string{statsLabelCluster, statsLabelNamespace, statsLabelOperation})
 	s.backendSQLFingerprintErrorCounts = stats.NewCountersWithMultiLabels("BackendSqlFingerprintErrorCounts",
-		"gaea proxy backend sql fingerprint error counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
+		"backend sql fingerprint error counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelFingerprint})
 	s.backendConnectPoolIdleCounts = stats.NewGaugesWithMultiLabels("backendConnectPoolIdleCounts",
-		"gaea proxy backend idle connect counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelSlice, statsLabelIPAddr})
+		"backend idle connect counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelSlice, statsLabelIPAddr})
 	s.backendConnectPoolInUseCounts = stats.NewGaugesWithMultiLabels("backendConnectPoolInUseCounts",
-		"gaea proxy backend in-use connect counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelSlice, statsLabelIPAddr})
+		"backend in-use connect counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelSlice, statsLabelIPAddr})
 	s.backendConnectPoolWaitCounts = stats.NewGaugesWithMultiLabels("backendConnectPoolWaitCounts",
-		"gaea proxy backend wait connect counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelSlice, statsLabelIPAddr})
+		"backend wait connect counts", []string{statsLabelCluster, statsLabelNamespace, statsLabelSlice, statsLabelIPAddr})
 
 	s.startClearTask()
 	return nil
