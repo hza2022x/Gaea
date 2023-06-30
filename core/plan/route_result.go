@@ -16,6 +16,7 @@ package plan
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/util"
 )
 
 // RouteResult is the route result of a statement
@@ -52,13 +53,13 @@ func (r *RouteResult) Check(db, table string) error {
 // Inter inter indexes with origin indexes in RouteResult
 // 如果是关联表, db, table需要用父表的db和table
 func (r *RouteResult) Inter(indexes []int) {
-	r.indexes = interList(r.indexes, indexes)
+	r.indexes = util.InterList(r.indexes, indexes)
 }
 
 // Union union indexes with origin indexes in RouteResult
 // 如果是关联表, db, table需要用父表的db和table
 func (r *RouteResult) Union(indexes []int) {
-	r.indexes = unionList(r.indexes, indexes)
+	r.indexes = util.UnionList(r.indexes, indexes)
 }
 
 // GetShardIndexes get shard indexes

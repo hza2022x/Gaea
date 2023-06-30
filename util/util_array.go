@@ -26,10 +26,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package plan
+package util
 
-/*2,5 ==> [2,3,4]*/
-func makeList(start, end int) []int {
+// MakeList *2,5 ==> [2,3,4]
+func MakeList(start, end int) []int {
 	if start >= end {
 		return []int{}
 	}
@@ -40,10 +40,10 @@ func makeList(start, end int) []int {
 	return list
 }
 
-// if value is 2016, and indexs is [2015,2016,2017]
+// MakeLeList if value is 2016, and indexs is [2015,2016,2017]
 // the result is [2015,2016]
 // the indexs must be sorted
-func makeLeList(value int, indexs []int) []int {
+func MakeLeList(value int, indexs []int) []int {
 	for k, v := range indexs {
 		if v == value {
 			return indexs[:k+1]
@@ -52,10 +52,10 @@ func makeLeList(value int, indexs []int) []int {
 	return nil
 }
 
-// if value is 2016, and indexs is [2015,2016,2017,2018]
+// MakeGeList if value is 2016, and indexs is [2015,2016,2017,2018]
 // the result is [2016,2017,2018]
 // the indexs must be sorted
-func makeGeList(value int, indexs []int) []int {
+func MakeGeList(value int, indexs []int) []int {
 	for k, v := range indexs {
 		if v == value {
 			return indexs[k:]
@@ -64,10 +64,10 @@ func makeGeList(value int, indexs []int) []int {
 	return nil
 }
 
-// if value is 2016, and indexs is [2015,2016,2017,2018]
+// MakeLtList if value is 2016, and indexs is [2015,2016,2017,2018]
 // the result is [2015]
 // the indexs must be sorted
-func makeLtList(value int, indexs []int) []int {
+func MakeLtList(value int, indexs []int) []int {
 	for k, v := range indexs {
 		if v == value {
 			return indexs[:k]
@@ -76,10 +76,10 @@ func makeLtList(value int, indexs []int) []int {
 	return nil
 }
 
-// if value is 2016, and indexs is [2015,2016,2017,2018]
+// MakeGtList if value is 2016, and indexs is [2015,2016,2017,2018]
 // the result is [2017,2018]
 // the indexs must be sorted
-func makeGtList(value int, indexs []int) []int {
+func MakeGtList(value int, indexs []int) []int {
 	for k, v := range indexs {
 		if v == value {
 			return indexs[k+1:]
@@ -88,10 +88,10 @@ func makeGtList(value int, indexs []int) []int {
 	return nil
 }
 
-// if start is 2016, end is 2017. indexs is [2015,2016,2017,2018]
+// MakeBetweenList if start is 2016, end is 2017. indexs is [2015,2016,2017,2018]
 // the result is [2016,2017]
 // the indexs must be sorted
-func makeBetweenList(start, end int, indexs []int) []int {
+func MakeBetweenList(start, end int, indexs []int) []int {
 	var startIndex, endIndex int
 	var SetStart bool
 	if end < start {
@@ -112,8 +112,8 @@ func makeBetweenList(start, end int, indexs []int) []int {
 	return nil
 }
 
-// l1 & l2
-func interList(l1 []int, l2 []int) []int {
+// InterList  l1 & l2
+func InterList(l1 []int, l2 []int) []int {
 	if len(l1) == 0 || len(l2) == 0 {
 		return []int{}
 	}
@@ -136,8 +136,8 @@ func interList(l1 []int, l2 []int) []int {
 	return l3
 }
 
-// l1 | l2
-func unionList(l1 []int, l2 []int) []int {
+// UnionList l1 | l2
+func UnionList(l1 []int, l2 []int) []int {
 	if len(l1) == 0 {
 		return l2
 	} else if len(l2) == 0 {
@@ -171,8 +171,8 @@ func unionList(l1 []int, l2 []int) []int {
 	return l3
 }
 
-// l1 - l2
-func differentList(l1 []int, l2 []int) []int {
+// DifferList l1 - l2
+func DifferList(l1 []int, l2 []int) []int {
 	if len(l1) == 0 {
 		return []int{}
 	} else if len(l2) == 0 {
@@ -202,7 +202,7 @@ func differentList(l1 []int, l2 []int) []int {
 	return l3
 }
 
-func cleanList(l []int) []int {
+func CleanList(l []int) []int {
 	s := make(map[int]struct{})
 	listLen := len(l)
 	l2 := make([]int, 0, listLen)
@@ -217,8 +217,8 @@ func cleanList(l []int) []int {
 	return l2
 }
 
-// list l need to be sorted
-func distinctList(l []int) []int {
+// DistinctList list l need to be sorted
+func DistinctList(l []int) []int {
 	if len(l) < 2 {
 		return l
 	}

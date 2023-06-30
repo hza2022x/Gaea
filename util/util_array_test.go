@@ -26,7 +26,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package plan
+package util
 
 import (
 	"sort"
@@ -53,119 +53,119 @@ func TestListSet(t *testing.T) {
 	l1 = []int{1, 2, 3}
 	l2 = []int{2}
 
-	l3 = interList(l1, l2)
+	l3 = InterList(l1, l2)
 	testCheckList(t, l3, 2)
 
 	l1 = []int{1, 2, 3}
 	l2 = []int{2, 3}
 
-	l3 = interList(l1, l2)
+	l3 = InterList(l1, l2)
 	testCheckList(t, l3, 2, 3)
 
 	l1 = []int{1, 2, 4}
 	l2 = []int{2, 3}
 
-	l3 = interList(l1, l2)
+	l3 = InterList(l1, l2)
 	testCheckList(t, l3, 2)
 
 	l1 = []int{1, 2, 4}
 	l2 = []int{}
 
-	l3 = interList(l1, l2)
+	l3 = InterList(l1, l2)
 	testCheckList(t, l3)
 
 	l1 = []int{1, 2, 3}
 	l2 = []int{2}
 
-	l3 = unionList(l1, l2)
+	l3 = UnionList(l1, l2)
 	testCheckList(t, l3, 1, 2, 3)
 
 	l1 = []int{1, 2, 4}
 	l2 = []int{3}
 
-	l3 = unionList(l1, l2)
+	l3 = UnionList(l1, l2)
 	testCheckList(t, l3, 1, 2, 3, 4)
 
 	l1 = []int{1, 2, 3}
 	l2 = []int{2, 3, 4}
 
-	l3 = unionList(l1, l2)
+	l3 = UnionList(l1, l2)
 	testCheckList(t, l3, 1, 2, 3, 4)
 
 	l1 = []int{1, 2, 3}
 	l2 = []int{}
 
-	l3 = unionList(l1, l2)
+	l3 = UnionList(l1, l2)
 	testCheckList(t, l3, 1, 2, 3)
 
 	l1 = []int{1, 2, 3, 4}
 	l2 = []int{2}
 
-	l3 = differentList(l1, l2)
+	l3 = DifferList(l1, l2)
 	testCheckList(t, l3, 1, 3, 4)
 
 	l1 = []int{1, 2, 3, 4}
 	l2 = []int{}
 
-	l3 = differentList(l1, l2)
+	l3 = DifferList(l1, l2)
 	testCheckList(t, l3, 1, 2, 3, 4)
 
 	l1 = []int{1, 2, 3, 4}
 	l2 = []int{1, 3, 5}
 
-	l3 = differentList(l1, l2)
+	l3 = DifferList(l1, l2)
 	testCheckList(t, l3, 2, 4)
 
 	l1 = []int{1, 2, 3}
 	l2 = []int{1, 3, 5, 6}
 
-	l3 = differentList(l1, l2)
+	l3 = DifferList(l1, l2)
 	testCheckList(t, l3, 2)
 
 	l1 = []int{1, 2, 3, 4}
 	l2 = []int{2, 3}
 
-	l3 = differentList(l1, l2)
+	l3 = DifferList(l1, l2)
 	testCheckList(t, l3, 1, 4)
 
 	l1 = []int{1, 2, 2, 1, 5, 3, 5, 2}
-	l2 = cleanList(l1)
+	l2 = CleanList(l1)
 	sort.Sort(sort.IntSlice(l2))
 	testCheckList(t, l2, 1, 2, 3, 5)
 }
 
 func TestMakeLeList(t *testing.T) {
 	l1 := []int{20150802, 20150812, 20150822, 20150823, 20150825, 20150828}
-	l2 := makeLeList(20150822, l1)
+	l2 := MakeLeList(20150822, l1)
 	testCheckList(t, l2, 20150802, 20150812, 20150822)
-	l3 := makeLeList(20150824, l1)
+	l3 := MakeLeList(20150824, l1)
 	testCheckList(t, l3, []int{}...)
 }
 
 func TestMakeLtList(t *testing.T) {
 	l1 := []int{20150802, 20150812, 20150822, 20150823, 20150825, 20150828}
-	l2 := makeLtList(20150822, l1)
+	l2 := MakeLtList(20150822, l1)
 	testCheckList(t, l2, 20150802, 20150812)
-	l3 := makeLtList(20150824, l1)
+	l3 := MakeLtList(20150824, l1)
 	testCheckList(t, l3, []int{}...)
-	l4 := makeLtList(20150802, l1)
+	l4 := MakeLtList(20150802, l1)
 	testCheckList(t, l4, []int{}...)
 }
 
 func TestMakeGeList(t *testing.T) {
 	l1 := []int{20150802, 20150812, 20150822, 20150823, 20150825, 20150828}
-	l2 := makeGeList(20150822, l1)
+	l2 := MakeGeList(20150822, l1)
 	testCheckList(t, l2, 20150822, 20150823, 20150825, 20150828)
-	l3 := makeGeList(20150828, l1)
+	l3 := MakeGeList(20150828, l1)
 	testCheckList(t, l3, 20150828)
 }
 
 func TestMakeGtList(t *testing.T) {
 	l1 := []int{20150802, 20150812, 20150822, 20150823, 20150825, 20150828}
-	l2 := makeGtList(20150822, l1)
+	l2 := MakeGtList(20150822, l1)
 	testCheckList(t, l2, 20150823, 20150825, 20150828)
-	l3 := makeGtList(20150824, l1)
+	l3 := MakeGtList(20150824, l1)
 	testCheckList(t, l3, []int{}...)
-	l4 := makeGtList(20150828, l1)
+	l4 := MakeGtList(20150828, l1)
 	testCheckList(t, l4, []int{}...)
 }

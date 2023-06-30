@@ -874,9 +874,9 @@ func getFindTableIndexesFunc(op opcode.Op) func(rule router.Rule, columnName str
 					if op == opcode.LT {
 						index = adjustShardIndex(rangeShard, v, index)
 					}
-					return makeList(rule.GetFirstTableIndex(), index+1), nil
+					return util.MakeList(rule.GetFirstTableIndex(), index+1), nil
 				} else {
-					return makeList(index, rule.GetLastTableIndex()+1), nil
+					return util.MakeList(index, rule.GetLastTableIndex()+1), nil
 				}
 			}
 
@@ -1005,7 +1005,7 @@ func mergeBinaryOperationRouteResult(op opcode.Op, lHas bool, lResult []int, rHa
 			return false, nil
 		}
 		if lHas && rHas {
-			return true, interList(lResult, rResult)
+			return true, util.InterList(lResult, rResult)
 		}
 		if lHas {
 			return true, lResult
@@ -1015,7 +1015,7 @@ func mergeBinaryOperationRouteResult(op opcode.Op, lHas bool, lResult []int, rHa
 		}
 	case opcode.LogicOr:
 		if lHas && rHas {
-			return true, unionList(lResult, rResult)
+			return true, util.UnionList(lResult, rResult)
 		}
 		return false, nil
 	}
