@@ -16,6 +16,7 @@ package server
 
 import (
 	"github.com/XiaoMi/Gaea/core/executor"
+	"github.com/XiaoMi/Gaea/util/log"
 	"net"
 	"runtime"
 	"strconv"
@@ -23,7 +24,6 @@ import (
 
 	"fmt"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/util"

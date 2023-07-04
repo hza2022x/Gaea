@@ -16,12 +16,11 @@ package file
 
 import (
 	"errors"
+	"github.com/XiaoMi/Gaea/util/log"
 	"io/ioutil"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/XiaoMi/Gaea/log"
 )
 
 const (

@@ -15,6 +15,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"math"
 	"sort"
 	"strconv"
@@ -24,7 +25,6 @@ import (
 
 	"github.com/pingcap/errors"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/stmtctx"
 	"github.com/XiaoMi/Gaea/parser/terror"

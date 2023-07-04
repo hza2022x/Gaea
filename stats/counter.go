@@ -17,9 +17,9 @@ limitations under the License.
 package stats
 
 import (
+	"github.com/XiaoMi/Gaea/util/log"
 	"strconv"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/util/sync2"
 )
 

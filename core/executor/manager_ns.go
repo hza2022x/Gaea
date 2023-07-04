@@ -3,8 +3,8 @@ package executor
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
+	"github.com/XiaoMi/Gaea/util/log"
 	"sort"
 )
 

@@ -20,7 +20,7 @@ package etcdclientv3
 import (
 	"context"
 	"errors"
-	"github.com/XiaoMi/Gaea/log"
+	"github.com/XiaoMi/Gaea/util/log"
 	"github.com/coreos/etcd/clientv3"
 	"strings"
 	"sync"

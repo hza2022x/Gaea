@@ -20,6 +20,7 @@ import (
 	"github.com/XiaoMi/Gaea/common/constant"
 	"github.com/XiaoMi/Gaea/core/plan"
 	"github.com/XiaoMi/Gaea/core/router"
+	"github.com/XiaoMi/Gaea/util/log"
 	"runtime"
 	"strconv"
 	"strings"
@@ -28,7 +29,6 @@ import (
 	"time"
 
 	"github.com/XiaoMi/Gaea/backend"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser"
 	"github.com/XiaoMi/Gaea/parser/ast"

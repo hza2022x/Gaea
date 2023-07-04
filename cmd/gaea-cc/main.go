@@ -17,14 +17,15 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/util/log"
+	"github.com/XiaoMi/Gaea/util/log/xlog"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
 	"github.com/XiaoMi/Gaea/cc"
-	"github.com/XiaoMi/Gaea/log"
-	"github.com/XiaoMi/Gaea/log/xlog"
 	"github.com/XiaoMi/Gaea/models"
 )
 

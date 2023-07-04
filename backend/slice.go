@@ -31,11 +31,11 @@ package backend
 import (
 	"context"
 	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/util/log"
 	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/util"

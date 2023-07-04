@@ -3,8 +3,8 @@ package server
 import (
 	"fmt"
 	"github.com/XiaoMi/Gaea/core/executor"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
+	"github.com/XiaoMi/Gaea/util/log"
 )
 
 // ExecuteCommand execute command

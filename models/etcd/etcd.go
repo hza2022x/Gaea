@@ -20,13 +20,12 @@ package etcdclient
 import (
 	"context"
 	"errors"
+	"github.com/XiaoMi/Gaea/util/log"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/coreos/etcd/client"
-
-	"github.com/XiaoMi/Gaea/log"
 )
 
 // ErrClosedEtcdClient means etcd client closed
@@ -259,18 +258,18 @@ func (c *EtcdClient) List(path string) ([]string, error) {
 
 // Watch watch path
 func (c *EtcdClient) Watch(path string, ch chan string) error {
-    c.Lock() // 在这里上锁
+	c.Lock() // 在这里上锁
 	// defer c.Unlock() // 移除此行，避免死结发生
 	if c.closed {
 		c.Unlock() // 上锁后记得解锁，去防止死结问题发生
 		panic(ErrClosedEtcdClient)
 	}
-	
+
 	watcher := c.kapi.Watcher(path, &client.WatcherOptions{Recursive: true})
-    
-    c.Unlock() // 上锁后在适当时机解锁，去防止死结问题发生
+
+	c.Unlock() // 上锁后在适当时机解锁，去防止死结问题发生
 	// 在这里解锁是最好的，因为解锁后立刻可以进行监听
-    
+
 	for {
 		res, err := watcher.Next(context.Background())
 		if err != nil {

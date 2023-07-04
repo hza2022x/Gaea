@@ -16,6 +16,7 @@ package cc
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"net"
 	"net/http"
 	"strings"
@@ -24,7 +25,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/XiaoMi/Gaea/cc/service"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 )
 

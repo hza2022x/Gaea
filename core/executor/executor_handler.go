@@ -5,10 +5,10 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/XiaoMi/Gaea/backend"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser/ast"
 	"github.com/XiaoMi/Gaea/util"
+	"github.com/XiaoMi/Gaea/util/log"
 	"strings"
 )
 

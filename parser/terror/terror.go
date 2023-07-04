@@ -16,11 +16,11 @@ package terror
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"strconv"
 
 	"github.com/pingcap/errors"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 )
 

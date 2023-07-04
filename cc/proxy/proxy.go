@@ -16,9 +16,9 @@ package proxy
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"time"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 )
 

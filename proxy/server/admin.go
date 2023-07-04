@@ -16,6 +16,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -24,7 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/util"
 	"github.com/gin-contrib/gzip"

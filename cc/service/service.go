@@ -16,10 +16,10 @@ package service
 
 import (
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"sync"
 
 	"github.com/XiaoMi/Gaea/cc/proxy"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 )
 

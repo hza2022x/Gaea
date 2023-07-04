@@ -2,13 +2,13 @@ package prometheus
 
 import (
 	"expvar"
+	"github.com/XiaoMi/Gaea/util/log"
 	"net/http"
 	"strings"
 
+	"github.com/XiaoMi/Gaea/stats"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/XiaoMi/Gaea/log"
-	"github.com/XiaoMi/Gaea/stats"
 )
 
 // PromBackend implements PullBackend using Prometheus as the backing metrics storage.

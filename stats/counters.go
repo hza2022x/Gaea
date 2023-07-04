@@ -19,10 +19,9 @@ package stats
 import (
 	"bytes"
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"sync"
 	"sync/atomic"
-
-	"github.com/XiaoMi/Gaea/log"
 )
 
 // counters is similar to expvar.Map, except that it doesn't allow floats.

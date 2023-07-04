@@ -31,11 +31,10 @@ import (
 	"bytes"
 	"expvar"
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/XiaoMi/Gaea/log"
 )
 
 const defaultEmitPeriod = 60 * time.Second

@@ -20,10 +20,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/util/log"
 	"net"
 	"strings"
 
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/util/sync2"
 )

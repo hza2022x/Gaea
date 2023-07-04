@@ -1,9 +1,9 @@
 package executor
 
 import (
-	"github.com/XiaoMi/Gaea/log"
-	"github.com/XiaoMi/Gaea/log/xlog"
 	"github.com/XiaoMi/Gaea/models"
+	"github.com/XiaoMi/Gaea/util/log"
+	"github.com/XiaoMi/Gaea/util/log/xlog"
 	"strconv"
 )
 

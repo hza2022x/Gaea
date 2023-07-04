@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"io"
 	"io/ioutil"
 	"net"
@@ -25,8 +26,6 @@ import (
 	"net/url"
 	"sync/atomic"
 	"time"
-
-	"github.com/XiaoMi/Gaea/log"
 )
 
 // Supported http methods

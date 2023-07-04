@@ -1,11 +1,11 @@
 package executor
 
 import (
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/stats"
 	"github.com/XiaoMi/Gaea/stats/prometheus"
+	"github.com/XiaoMi/Gaea/util/log"
 	"net/http"
 	"time"
 )

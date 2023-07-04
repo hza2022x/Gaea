@@ -18,11 +18,11 @@ import (
 	"encoding/json"
 	"fmt"
 	etcdclientv3 "github.com/XiaoMi/Gaea/models/etcdv3"
+	"github.com/XiaoMi/Gaea/util/log"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/XiaoMi/Gaea/log"
 	etcdclient "github.com/XiaoMi/Gaea/models/etcd"
 	fileclient "github.com/XiaoMi/Gaea/models/file"
 )

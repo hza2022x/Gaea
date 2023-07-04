@@ -17,12 +17,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/XiaoMi/Gaea/util/log"
 	"github.com/go-ini/ini"
 	"testing"
 
 	"github.com/XiaoMi/Gaea/backend"
 	"github.com/XiaoMi/Gaea/backend/mocks"
-	"github.com/XiaoMi/Gaea/log"
 	"github.com/XiaoMi/Gaea/models"
 	"github.com/XiaoMi/Gaea/mysql"
 	"github.com/XiaoMi/Gaea/parser"
