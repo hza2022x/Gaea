@@ -1,4 +1,9 @@
 package initer
 
-type Loader interface {
+type Initer interface {
+	InitConfig()
+
+	InitPhysicalDs()
+
+	InitDataSource()
 }
