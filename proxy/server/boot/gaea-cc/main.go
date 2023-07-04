@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/XiaoMi/Gaea/common/constant"
+	"github.com/XiaoMi/Gaea/proxy/server/cc"
 	"github.com/XiaoMi/Gaea/util/log"
 	"github.com/XiaoMi/Gaea/util/log/xlog"
 	"os"
@@ -25,7 +26,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/XiaoMi/Gaea/cc"
 	"github.com/XiaoMi/Gaea/models"
 )
 
