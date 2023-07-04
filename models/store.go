@@ -17,13 +17,11 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	etcdclientv3 "github.com/XiaoMi/Gaea/models/etcdv3"
 	"github.com/XiaoMi/Gaea/util/log"
 	"path/filepath"
 	"strings"
 	"time"
 
-	etcdclient "github.com/XiaoMi/Gaea/models/etcd"
 	fileclient "github.com/XiaoMi/Gaea/models/file"
 )
 
@@ -60,22 +58,6 @@ func NewClient(configType, addr, username, password, root string) Client {
 		c, err := fileclient.New(root)
 		if err != nil {
 			log.Warn("create fileclient failed, %s", addr)
-			return nil
-		}
-		return c
-	case ConfigEtcd:
-		// 使用 Etcd V2 API 去读取设定值
-		c, err := etcdclient.New(addr, time.Minute, username, password, root)
-		if err != nil {
-			log.Fatal("create etcdclient v2 to %s failed, %v", addr, err)
-			return nil
-		}
-		return c
-	case ConfigEtcdV3:
-		// 使用 Etcd V3 API 去读取设定值
-		c, err := etcdclientv3.New(addr, time.Minute, username, password, root)
-		if err != nil {
-			log.Fatal("create etcdclient v3 to %s failed, %v", addr, err)
 			return nil
 		}
 		return c

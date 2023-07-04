@@ -47,8 +47,8 @@ const (
 )
 
 // NewXFileLog is the constructor of XFileLog
-//生成一个日志实例，service用来标识业务的服务名。
-//比如：logger := xlog.NewXFileLog("gaea")
+// 生成一个日志实例，service用来标识业务的服务名。
+// 比如：logger := xlog.NewXFileLog("gaea")
 func NewXFileLog() XLogger {
 	return &XFileLog{
 		skip: XLogDefSkipNum,
